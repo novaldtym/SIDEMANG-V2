@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SI-DEMANG KREBET — Input Data Penduduk</title>
+  <meta name="description"
+    content="Sistem Informasi Demografi dan Pemetaan UMKM Desa Krebet, Bantul. Form pendataan warga.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          colors: {
+            brand: { 50: '#ecfdf5', 100: '#d1fae5', 200: '#a7f3d0', 300: '#6ee7b7', 400: '#34d399', 500: '#10b981', 600: '#059669', 700: '#047857', 800: '#065f46', 900: '#064e3b', 950: '#022c22' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .glass {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .input-focus:focus {
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-fadeUp {
+      animation: fadeUp 0.5s ease-out both;
+    }
+
+    @keyframes spin-slow {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .spinner {
+      animation: spin-slow 0.8s linear infinite;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen bg-gradient-to-br from-brand-950 via-brand-900 to-emerald-800 text-gray-800">
+
+  <!-- NAVBAR -->
+  <nav class="sticky top-0 z-50 glass border-b border-white/20 shadow-lg">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2">
+        <div class="w-9 h-9 rounded-lg bg-brand-600 flex items-center justify-center shadow">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M12 21c-4.97 0-9-2.686-9-6V9c0-3.314 4.03-6 9-6s9 2.686 9 6v6c0 3.314-4.03 6-9 6z" />
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M12 11c2.21 0 4-1.343 4-3s-1.79-3-4-3-4 1.343-4 3 1.79 3 4 3z" />
+          </svg>
+        </div>
+        <span class="font-extrabold text-brand-900 text-lg tracking-tight">SI-DEMANG</span>
+      </a>
+      <div class="hidden sm:flex items-center gap-1">
+        <a href="index.html" class="px-3 py-1.5 rounded-lg text-sm font-semibold bg-brand-600 text-white shadow">Input
+          Data</a>
+        <a href="dashboard.html"
+          class="px-3 py-1.5 rounded-lg text-sm font-medium text-brand-800 hover:bg-brand-100 transition">Dashboard</a>
+        <a href="map.html"
+          class="px-3 py-1.5 rounded-lg text-sm font-medium text-brand-800 hover:bg-brand-100 transition">Peta</a>
+      </div>
+      <button id="mobileMenuBtn" class="sm:hidden p-2 rounded-lg hover:bg-brand-100 transition">
+        <svg class="w-6 h-6 text-brand-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </div>
+    <div id="mobileMenu" class="hidden sm:hidden px-4 pb-3 space-y-1">
+      <a href="index.html" class="block px-3 py-2 rounded-lg text-sm font-semibold bg-brand-600 text-white">Input
+        Data</a>
+      <a href="dashboard.html"
+        class="block px-3 py-2 rounded-lg text-sm font-medium text-brand-800 hover:bg-brand-100">Dashboard</a>
+      <a href="map.html"
+        class="block px-3 py-2 rounded-lg text-sm font-medium text-brand-800 hover:bg-brand-100">Peta</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="max-w-3xl mx-auto px-4 pt-10 pb-6 text-center animate-fadeUp">
+    <h1 class="text-3xl sm:text-4xl font-extrabold text-white drop-shadow-lg">📋 Pendataan Warga</h1>
+    <p class="mt-2 text-brand-200 text-sm sm:text-base max-w-lg mx-auto">Isi formulir berikut untuk mendata penduduk dan
+      pelaku UMKM di Desa Krebet, Kecamatan Pajangan, Kabupaten Bantul.</p>
+  </header>
+
+  <!-- FORM CARD -->
+  <main class="max-w-2xl mx-auto px-4 pb-16 animate-fadeUp" style="animation-delay:0.15s">
+    <form id="dataForm" class="glass rounded-2xl shadow-2xl border border-white/30 p-6 sm:p-8 space-y-5">
+
+      <!-- NIK -->
+      <div>
+        <label for="nik" class="block text-sm font-semibold text-brand-900 mb-1">NIK <span
+            class="text-red-500">*</span></label>
+        <input type="text" id="nik" name="NIK" required maxlength="16" pattern="\d{16}" inputmode="numeric"
+          class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white/80 text-sm input-focus focus:outline-none focus:border-brand-500 transition"
+          placeholder="16 digit NIK">
+      </div>
+
+      <!-- Nama -->
+      <div>
+        <label for="nama" class="block text-sm font-semibold text-brand-900 mb-1">Nama Lengkap <span
+            class="text-red-500">*</span></label>
+        <input type="text" id="nama" name="Nama_Lengkap" required
+          class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white/80 text-sm input-focus focus:outline-none focus:border-brand-500 transition"
+          placeholder="Contoh: Budi Santoso">
+      </div>
+
+      <!-- RT & Usia (2-col) -->
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label for="rt" class="block text-sm font-semibold text-brand-900 mb-1">RT <span
+              class="text-red-500">*</span></label>
+          <input type="text" id="rt" name="RT" required
+            class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white/80 text-sm input-focus focus:outline-none focus:border-brand-500 transition"
+            placeholder="01">
+        </div>
+        <div>
+          <label for="usia" class="block text-sm font-semibold text-brand-900 mb-1">Usia <span
+              class="text-red-500">*</span></label>
+          <input type="number" id="usia" name="Usia" required min="0" max="150" inputmode="numeric"
+            class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white/80 text-sm input-focus focus:outline-none focus:border-brand-500 transition"
+            placeholder="35">
+        </div>
+      </div>
+
+      <!-- Pekerjaan -->
+      <div>
+        <label for="pekerjaan" class="block text-sm font-semibold text-brand-900 mb-1">Pekerjaan <span
+            class="text-red-500">*</span></label>
+        <select id="pekerjaan" name="Pekerjaan" required
+          class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white/80 text-sm input-focus focus:outline-none focus:border-brand-500 transition">
+          <option value="">— Pilih Pekerjaan —</option>
+          <option>Petani</option>
+          <option>Pedagang</option>
+          <option>PNS</option>
+          <option>Wiraswasta</option>
+          <option>Buruh</option>
+          <option>Pengrajin</option>
+          <option>Ibu Rumah Tangga</option>
+          <option>Pelajar/Mahasiswa</option>
+          <option>Tidak Bekerja</option>
+          <option>Lainnya</option>
+        </select>
+      </div>
+
+      <!-- Jenis UMKM -->
+      <div>
+        <label for="umkm" class="block text-sm font-semibold text-brand-900 mb-1">Jenis UMKM <span
+            class="text-gray-400 font-normal">(opsional)</span></label>
+        <select id="umkm" name="Jenis_UMKM"
+          class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white/80 text-sm input-focus focus:outline-none focus:border-brand-500 transition">
+          <option value="-">— Tidak Ada —</option>
+          <option>Kerajinan Batik Kayu</option>
+          <option>Kuliner / Makanan</option>
+          <option>Warung / Toko Kelontong</option>
+          <option>Pertanian / Perkebunan</option>
+          <option>Jasa</option>
+          <option>Konveksi / Tekstil</option>
+          <option>Kerajinan Tangan</option>
+          <option>Lainnya</option>
+        </select>
+      </div>
+
+      <!-- Koordinat -->
+      <div class="bg-brand-50 border border-brand-200 rounded-xl p-4 space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-sm font-semibold text-brand-900">📍 Koordinat Lokasi</span>
+          <button type="button" id="geoBtn"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold shadow transition active:scale-95">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 2a7 7 0 017 7c0 5.25-7 13-7 13S5 14.25 5 9a7 7 0 017-7z" />
+              <circle cx="12" cy="9" r="2.5" />
+            </svg>
+            Ambil Lokasi Saat Ini
+          </button>
+        </div>
+        <div id="geoStatus" class="text-xs text-brand-700 hidden"></div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label for="lat" class="block text-xs font-medium text-brand-800 mb-1">Latitude</label>
+            <input type="text" id="lat" name="Latitude" required readonly
+              class="w-full px-3 py-2 rounded-lg border border-brand-200 bg-white text-sm text-center font-mono"
+              placeholder="-7.xxxx">
+          </div>
+          <div>
+            <label for="lng" class="block text-xs font-medium text-brand-800 mb-1">Longitude</label>
+            <input type="text" id="lng" name="Longitude" required readonly
+              class="w-full px-3 py-2 rounded-lg border border-brand-200 bg-white text-sm text-center font-mono"
+              placeholder="110.xxxx">
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" id="submitBtn"
+        class="w-full py-3 rounded-xl bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-700 hover:to-emerald-600 text-white font-bold text-base shadow-lg hover:shadow-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+        <span id="submitText">Kirim Data</span>
+        <svg id="submitSpinner" class="w-5 h-5 spinner hidden" fill="none" stroke="currentColor" stroke-width="2.5"
+          viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 12a8 8 0 018-8" />
+        </svg>
+      </button>
+    </form>
+
+    <!-- Alert -->
+    <div id="alertBox" class="hidden mt-4 p-4 rounded-xl text-sm font-medium shadow-lg transition-all"></div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="text-center py-6 text-brand-300 text-xs">
+    &copy; 2026 KKN UPN "Veteran" Yogyakarta — Desa Krebet, Pajangan, Bantul
+  </footer>
+
+  <script>
+    // ============================================================
+    // CONFIGURATION — Replace with your deployed GAS Web App URL
+    // ============================================================
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbwOiK7_-CV3SfPBt2fl6yYDiMMCV2LB6QXV2OQDQxMtki7FFWu61twVribaGJYWVwPT/exec';
+
+    // Mobile menu toggle
+    document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+      document.getElementById('mobileMenu').classList.toggle('hidden');
+    });
+
+    // Geolocation
+    document.getElementById('geoBtn').addEventListener('click', () => {
+      const status = document.getElementById('geoStatus');
+      status.classList.remove('hidden');
+      status.textContent = '⏳ Mengambil lokasi GPS...';
+      status.className = 'text-xs text-brand-700';
+
+      if (!navigator.geolocation) {
+        status.textContent = '❌ Browser tidak mendukung Geolocation.';
+        status.className = 'text-xs text-red-600';
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          document.getElementById('lat').value = pos.coords.latitude.toFixed(6);
+          document.getElementById('lng').value = pos.coords.longitude.toFixed(6);
+          status.textContent = '✅ Lokasi berhasil diambil! Akurasi: ±' + pos.coords.accuracy.toFixed(0) + ' meter';
+          status.className = 'text-xs text-green-700 font-medium';
+        },
+        (err) => {
+          const msgs = { 1: 'Izin lokasi ditolak.', 2: 'Lokasi tidak tersedia.', 3: 'Waktu habis.' };
+          status.textContent = '❌ ' + (msgs[err.code] || err.message);
+          status.className = 'text-xs text-red-600';
+        },
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+      );
+    });
+
+    // Form submit
+    document.getElementById('dataForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const btn = document.getElementById('submitBtn');
+      const text = document.getElementById('submitText');
+      const spin = document.getElementById('submitSpinner');
+      const alert = document.getElementById('alertBox');
+
+      // Validate GAS URL
+      if (!GAS_URL || GAS_URL.includes('YOUR_GAS_WEB_APP_URL_HERE')) {
+        showAlert('⚠️ GAS URL belum dikonfigurasi! Silakan ganti YOUR_GAS_WEB_APP_URL_HERE di kode.', 'warning');
+        return;
+      }
+
+      btn.disabled = true;
+      text.textContent = 'Mengirim...';
+      spin.classList.remove('hidden');
+
+      const payload = {
+        NIK: document.getElementById('nik').value.trim(),
+        Nama_Lengkap: document.getElementById('nama').value.trim(),
+        RT: document.getElementById('rt').value.trim(),
+        Usia: document.getElementById('usia').value,
+        Pekerjaan: document.getElementById('pekerjaan').value,
+        Jenis_UMKM: document.getElementById('umkm').value,
+        Latitude: document.getElementById('lat').value,
+        Longitude: document.getElementById('lng').value,
+      };
+
+      try {
+        const res = await fetch(GAS_URL, {
+          method: 'POST',
+          body: JSON.stringify(payload),
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        });
+        const json = await res.json();
+
+        if (json.success) {
+          showAlert('✅ ' + json.message, 'success');
+          document.getElementById('dataForm').reset();
+          document.getElementById('geoStatus').classList.add('hidden');
+        } else {
+          showAlert('❌ Gagal: ' + json.error, 'error');
+        }
+      } catch (err) {
+        showAlert('❌ Network error: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        text.textContent = 'Kirim Data';
+        spin.classList.add('hidden');
+      }
+    });
+
+    function showAlert(msg, type) {
+      const el = document.getElementById('alertBox');
+      el.classList.remove('hidden');
+      el.textContent = msg;
+      const styles = {
+        success: 'bg-green-100 border border-green-300 text-green-800',
+        error: 'bg-red-100 border border-red-300 text-red-800',
+        warning: 'bg-yellow-100 border border-yellow-300 text-yellow-800',
+      };
+      el.className = 'mt-4 p-4 rounded-xl text-sm font-medium shadow-lg ' + (styles[type] || styles.warning);
+      setTimeout(() => el.classList.add('hidden'), 6000);
+    }
+  </script>
+</body>
+
+</html>

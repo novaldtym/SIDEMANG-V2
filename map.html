@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SI-DEMANG KREBET — Peta Digital</title>
+  <meta name="description" content="Peta digital WebGIS demografi dan sebaran UMKM Desa Krebet, Bantul.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          colors: {
+            brand: { 50: '#ecfdf5', 100: '#d1fae5', 200: '#a7f3d0', 300: '#6ee7b7', 400: '#34d399', 500: '#10b981', 600: '#059669', 700: '#047857', 800: '#065f46', 900: '#064e3b', 950: '#022c22' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; margin: 0; overflow: hidden; }
+    .glass { background: rgba(255,255,255,0.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+
+    /* Layout */
+    .map-wrapper { display: flex; height: calc(100vh - 56px); position: relative; }
+    #map { flex: 1; height: 100%; min-width: 0; }
+
+    /* Sidebar */
+    .sidebar {
+      width: 380px; height: 100%; background: #fff; border-left: 1px solid #e5e7eb;
+      display: flex; flex-direction: column; z-index: 800; flex-shrink: 0;
+      transition: margin-right 0.3s ease;
+    }
+    .sidebar.collapsed { margin-right: -380px; }
+
+    /* Mobile sidebar overlay */
+    @media (max-width: 767px) {
+      .sidebar {
+        position: absolute; right: 0; top: 0; width: 100%; max-width: 360px;
+        box-shadow: -4px 0 24px rgba(0,0,0,0.15);
+      }
+      .sidebar.collapsed { transform: translateX(100%); margin-right: 0; }
+      .sidebar { transition: transform 0.3s ease; }
+    }
+
+    /* Toggle button */
+    .sidebar-toggle {
+      position: absolute; right: 380px; top: 12px; z-index: 900;
+      transition: right 0.3s ease;
+    }
+    .sidebar-toggle.shifted { right: 12px; }
+    @media (max-width: 767px) {
+      .sidebar-toggle { right: 12px; }
+      .sidebar-toggle.shifted { right: 12px; }
+    }
+
+    /* List items */
+    .loc-item {
+      padding: 12px 16px; border-bottom: 1px solid #f3f4f6; cursor: pointer;
+      transition: background 0.15s;
+    }
+    .loc-item:hover { background: #ecfdf5; }
+    .loc-item.active { background: #d1fae5; border-left: 3px solid #059669; }
+
+    /* Scrollbar */
+    .sidebar-list::-webkit-scrollbar { width: 5px; }
+    .sidebar-list::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+
+    /* Leaflet popups */
+    .leaflet-popup-content-wrapper { border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); }
+    .leaflet-popup-content { margin: 12px 16px; font-family: 'Inter', sans-serif; }
+    .custom-popup h3 { font-size: 14px; font-weight: 700; color: #064e3b; margin: 0 0 6px; }
+    .custom-popup p { font-size: 12px; color: #374151; margin: 2px 0; }
+    .custom-popup .badge { display: inline-block; padding: 2px 8px; border-radius: 9999px; font-size: 11px; font-weight: 600; }
+    .custom-popup .badge-umkm { background: #d1fae5; color: #065f46; }
+    .custom-popup .badge-none { background: #f3f4f6; color: #9ca3af; }
+
+    /* Loading overlay */
+    .map-loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); z-index: 1000; }
+    @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.4} }
+    .pulse-dot { animation: pulse-dot 1.5s ease-in-out infinite; }
+
+    /* Legend */
+    .legend { background: rgba(255,255,255,0.9); backdrop-filter: blur(8px); padding: 12px 16px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.12); font-size: 12px; line-height: 20px; }
+    .legend h4 { font-weight: 700; font-size: 13px; margin: 0 0 6px; color: #064e3b; }
+    .legend-item { display: flex; align-items: center; gap: 8px; margin: 3px 0; }
+    .legend-dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+  </style>
+</head>
+
+<body class="bg-gray-100">
+
+  <!-- NAVBAR -->
+  <nav class="sticky top-0 z-[1100] glass border-b border-white/20 shadow-lg">
+    <div class="max-w-full mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2">
+        <div class="w-9 h-9 rounded-lg bg-brand-600 flex items-center justify-center shadow">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M12 21c-4.97 0-9-2.686-9-6V9c0-3.314 4.03-6 9-6s9 2.686 9 6v6c0 3.314-4.03 6-9 6z" />
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M12 11c2.21 0 4-1.343 4-3s-1.79-3-4-3-4 1.343-4 3 1.79 3 4 3z" />
+          </svg>
+        </div>
+        <span class="font-extrabold text-brand-900 text-lg tracking-tight">SI-DEMANG</span>
+      </a>
+      <div class="hidden sm:flex items-center gap-1">
+        <a href="index.html"
+          class="px-3 py-1.5 rounded-lg text-sm font-medium text-brand-800 hover:bg-brand-100 transition">Input Data</a>
+        <a href="dashboard.html"
+          class="px-3 py-1.5 rounded-lg text-sm font-medium text-brand-800 hover:bg-brand-100 transition">Dashboard</a>
+        <a href="map.html" class="px-3 py-1.5 rounded-lg text-sm font-semibold bg-brand-600 text-white shadow">Peta</a>
+      </div>
+      <div class="flex items-center gap-2">
+        <span id="markerCount"
+          class="hidden sm:inline-flex items-center gap-1 px-3 py-1 rounded-full bg-brand-100 text-brand-700 text-xs font-semibold">
+          <span class="w-2 h-2 rounded-full bg-brand-500"></span> <span id="markerNum">0</span> titik
+        </span>
+        <button id="mobileMenuBtn" class="sm:hidden p-2 rounded-lg hover:bg-brand-100 transition">
+          <svg class="w-6 h-6 text-brand-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div id="mobileMenu" class="hidden sm:hidden px-4 pb-3 space-y-1">
+      <a href="index.html"
+        class="block px-3 py-2 rounded-lg text-sm font-medium text-brand-800 hover:bg-brand-100">Input Data</a>
+      <a href="dashboard.html"
+        class="block px-3 py-2 rounded-lg text-sm font-medium text-brand-800 hover:bg-brand-100">Dashboard</a>
+      <a href="map.html" class="block px-3 py-2 rounded-lg text-sm font-semibold bg-brand-600 text-white">Peta</a>
+    </div>
+  </nav>
+
+  <!-- MAP + SIDEBAR LAYOUT -->
+  <div class="map-wrapper">
+
+    <!-- Map -->
+    <div style="position:relative; flex:1; min-width:0;">
+      <div id="map"></div>
+      <!-- Loading overlay -->
+      <div id="mapLoading" class="map-loading">
+        <div class="glass rounded-xl px-5 py-3 shadow-xl flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-brand-500 pulse-dot"></span>
+          <span class="w-2 h-2 rounded-full bg-brand-500 pulse-dot" style="animation-delay:0.3s"></span>
+          <span class="w-2 h-2 rounded-full bg-brand-500 pulse-dot" style="animation-delay:0.6s"></span>
+          <span class="ml-1 text-sm font-medium text-brand-800">Memuat peta...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar Toggle Button -->
+    <button id="sidebarToggle" class="sidebar-toggle"
+      title="Toggle Daftar Lokasi">
+      <div class="bg-white shadow-lg rounded-lg px-3 py-2 flex items-center gap-2 hover:bg-brand-50 transition border border-gray-200">
+        <svg id="toggleIconList" class="w-5 h-5 text-brand-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+        </svg>
+        <svg id="toggleIconClose" class="w-5 h-5 text-brand-700 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+        </svg>
+        <span class="text-xs font-semibold text-brand-800 hidden sm:inline" id="toggleLabel">Daftar Lokasi</span>
+      </div>
+    </button>
+
+    <!-- Sidebar Panel -->
+    <div id="sidebar" class="sidebar collapsed">
+      <!-- Sidebar Header -->
+      <div class="px-4 py-3 border-b border-gray-200 bg-brand-50 flex-shrink-0">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-base font-bold text-brand-900 flex items-center gap-2">
+            <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            Daftar Lokasi
+          </h2>
+          <span id="sidebarCount" class="text-xs font-semibold text-brand-600 bg-brand-100 px-2 py-0.5 rounded-full">0</span>
+        </div>
+        <!-- Search -->
+        <div class="relative">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="m21 21-4.35-4.35"/>
+          </svg>
+          <input type="text" id="searchInput" placeholder="Cari nama atau UMKM..."
+            class="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-gray-300 bg-white focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition">
+        </div>
+        <!-- Filter Tabs -->
+        <div class="flex gap-1 mt-2">
+          <button data-filter="all" class="filter-tab active-tab px-3 py-1 rounded-full text-xs font-semibold transition">Semua</button>
+          <button data-filter="umkm" class="filter-tab px-3 py-1 rounded-full text-xs font-semibold transition">🏪 UMKM</button>
+          <button data-filter="warga" class="filter-tab px-3 py-1 rounded-full text-xs font-semibold transition">🏘️ Warga</button>
+        </div>
+      </div>
+
+      <!-- Sidebar List -->
+      <div id="sidebarList" class="sidebar-list flex-1 overflow-y-auto">
+        <!-- Items will be injected here -->
+      </div>
+
+      <!-- Sidebar Footer -->
+      <div class="px-4 py-2 border-t border-gray-200 bg-gray-50 flex-shrink-0">
+        <p class="text-xs text-gray-500 text-center">Klik item untuk zoom ke lokasi</p>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .filter-tab { background: #f3f4f6; color: #6b7280; }
+    .filter-tab:hover { background: #e5e7eb; }
+    .filter-tab.active-tab { background: #059669; color: #fff; }
+  </style>
+
+  <script>
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbwOiK7_-CV3SfPBt2fl6yYDiMMCV2LB6QXV2OQDQxMtki7FFWu61twVribaGJYWVwPT/exec';
+
+    // Mobile menu
+    document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+      document.getElementById('mobileMenu').classList.toggle('hidden');
+    });
+
+    // Initialize map centered on Krebet, Bantul
+    const map = L.map('map', { zoomControl: false }).setView([-7.8703, 110.3150], 15);
+    L.control.zoom({ position: 'topright' }).addTo(map);
+
+    // Tile layers
+    const osmLight = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
+    });
+    const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 19, attribution: '&copy; Esri'
+    });
+    osmLight.addTo(map);
+    L.control.layers({ 'Peta': osmLight, 'Satelit': satellite }, null, { position: 'topright' }).addTo(map);
+
+    // Custom marker icon
+    function createIcon(isUmkm) {
+      const color = isUmkm ? '#059669' : '#6b7280';
+      return L.divIcon({
+        className: '',
+        html: '<div style="width:28px;height:28px;border-radius:50% 50% 50% 0;background:' + color + ';transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center"><div style="width:8px;height:8px;background:#fff;border-radius:50%;transform:rotate(45deg)"></div></div>',
+        iconSize: [28, 28],
+        iconAnchor: [14, 28],
+        popupAnchor: [0, -30]
+      });
+    }
+
+    // Legend
+    const legend = L.control({ position: 'bottomleft' });
+    legend.onAdd = function () {
+      const div = L.DomUtil.create('div', 'legend');
+      div.innerHTML = '<h4>Legenda</h4>'
+        + '<div class="legend-item"><span class="legend-dot" style="background:#059669"></span> Pelaku UMKM</div>'
+        + '<div class="legend-item"><span class="legend-dot" style="background:#6b7280"></span> Non-UMKM</div>';
+      return div;
+    };
+    legend.addTo(map);
+
+    // ============================================================
+    // SIDEBAR LOGIC
+    // ============================================================
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const toggleIconList = document.getElementById('toggleIconList');
+    const toggleIconClose = document.getElementById('toggleIconClose');
+    const toggleLabel = document.getElementById('toggleLabel');
+    let sidebarOpen = false;
+
+    sidebarToggle.addEventListener('click', () => {
+      sidebarOpen = !sidebarOpen;
+      sidebar.classList.toggle('collapsed', !sidebarOpen);
+      sidebarToggle.classList.toggle('shifted', !sidebarOpen);
+      toggleIconList.classList.toggle('hidden', sidebarOpen);
+      toggleIconClose.classList.toggle('hidden', !sidebarOpen);
+      toggleLabel.textContent = sidebarOpen ? 'Tutup' : 'Daftar Lokasi';
+      // Invalidate map size after sidebar animation
+      setTimeout(() => map.invalidateSize(), 350);
+    });
+
+    // Store all location data and markers for interaction
+    let allLocations = [];
+    let activeItemIndex = -1;
+
+    // Build popup HTML
+    function buildPopupHtml(d, isUmkm) {
+      const umkmBadge = isUmkm
+        ? '<span class="badge badge-umkm">' + d.Jenis_UMKM + '</span>'
+        : '<span class="badge badge-none">Tidak ada</span>';
+      return '<div class="custom-popup">'
+        + '<h3>' + (d.Nama_Lengkap || '-') + '</h3>'
+        + '<p>🏘️ RT ' + (d.RT || '-') + ' &nbsp;|&nbsp; 🎂 ' + (d.Usia || '-') + ' tahun</p>'
+        + '<p>💼 ' + (d.Pekerjaan || '-') + '</p>'
+        + '<p style="margin-top:6px">🏪 UMKM: ' + umkmBadge + '</p>'
+        + '</div>';
+    }
+
+    // Fly to a location and open popup
+    function flyToLocation(index) {
+      const loc = allLocations[index];
+      if (!loc) return;
+
+      // Highlight active item in sidebar
+      document.querySelectorAll('.loc-item').forEach(el => el.classList.remove('active'));
+      const activeEl = document.querySelector('[data-index="' + index + '"]');
+      if (activeEl) {
+        activeEl.classList.add('active');
+        activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+      activeItemIndex = index;
+
+      // Fly to location and open popup
+      map.flyTo([loc.lat, loc.lng], 18, { duration: 1.2 });
+      setTimeout(() => { loc.marker.openPopup(); }, 1300);
+    }
+
+    // Render sidebar list
+    function renderSidebarList(filter, searchQuery) {
+      const list = document.getElementById('sidebarList');
+      list.innerHTML = '';
+
+      let filtered = allLocations;
+
+      // Apply filter
+      if (filter === 'umkm') {
+        filtered = filtered.filter(l => l.isUmkm);
+      } else if (filter === 'warga') {
+        filtered = filtered.filter(l => !l.isUmkm);
+      }
+
+      // Apply search
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        filtered = filtered.filter(l =>
+          (l.data.Nama_Lengkap || '').toLowerCase().includes(q) ||
+          (l.data.Jenis_UMKM || '').toLowerCase().includes(q) ||
+          (l.data.Pekerjaan || '').toLowerCase().includes(q) ||
+          ('rt ' + (l.data.RT || '')).toLowerCase().includes(q)
+        );
+      }
+
+      document.getElementById('sidebarCount').textContent = filtered.length;
+
+      if (filtered.length === 0) {
+        list.innerHTML = '<div class="px-4 py-12 text-center text-gray-400"><svg class="w-10 h-10 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg><p class="text-sm font-medium">Tidak ada data ditemukan</p></div>';
+        return;
+      }
+
+      filtered.forEach(loc => {
+        const isActive = loc.index === activeItemIndex;
+        const umkmLabel = loc.isUmkm
+          ? '<span class="inline-block px-2 py-0.5 rounded-full bg-brand-100 text-brand-700 text-[10px] font-semibold">' + loc.data.Jenis_UMKM + '</span>'
+          : '<span class="inline-block px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 text-[10px] font-semibold">Non-UMKM</span>';
+
+        const item = document.createElement('div');
+        item.className = 'loc-item' + (isActive ? ' active' : '');
+        item.setAttribute('data-index', loc.index);
+        item.innerHTML =
+          '<div class="flex items-start gap-3">'
+          + '<div class="mt-0.5 flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold" style="background:' + (loc.isUmkm ? '#059669' : '#6b7280') + '">'
+          + (loc.data.Nama_Lengkap ? loc.data.Nama_Lengkap.charAt(0).toUpperCase() : '?')
+          + '</div>'
+          + '<div class="min-w-0 flex-1">'
+          + '<p class="text-sm font-semibold text-gray-900 truncate">' + (loc.data.Nama_Lengkap || '-') + '</p>'
+          + '<p class="text-xs text-gray-500 mt-0.5">RT ' + (loc.data.RT || '-') + ' · ' + (loc.data.Pekerjaan || '-') + ' · ' + (loc.data.Usia || '-') + ' thn</p>'
+          + '<div class="mt-1">' + umkmLabel + '</div>'
+          + '</div>'
+          + '<svg class="w-4 h-4 text-gray-300 flex-shrink-0 mt-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>'
+          + '</div>';
+
+        item.addEventListener('click', () => flyToLocation(loc.index));
+        list.appendChild(item);
+      });
+    }
+
+    // Filter tabs
+    let currentFilter = 'all';
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        currentFilter = tab.dataset.filter;
+        document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active-tab'));
+        tab.classList.add('active-tab');
+        renderSidebarList(currentFilter, document.getElementById('searchInput').value);
+      });
+    });
+
+    // Search
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      renderSidebarList(currentFilter, e.target.value);
+    });
+
+    // ============================================================
+    // LOAD DATA & RENDER MARKERS + LIST
+    // ============================================================
+    async function loadMarkers() {
+      try {
+        const res = await fetch(GAS_URL);
+        const json = await res.json();
+        if (!json.success) throw new Error(json.error);
+
+        const data = json.data;
+        let count = 0;
+
+        data.forEach((d, i) => {
+          const lat = parseFloat(d.Latitude);
+          const lng = parseFloat(d.Longitude);
+          if (isNaN(lat) || isNaN(lng) || lat === 0 || lng === 0) return;
+
+          const isUmkm = d.Jenis_UMKM && d.Jenis_UMKM !== '-';
+          const popupHtml = buildPopupHtml(d, isUmkm);
+
+          const marker = L.marker([lat, lng], { icon: createIcon(isUmkm) })
+            .addTo(map)
+            .bindPopup(popupHtml, { maxWidth: 260 });
+
+          // Store for sidebar interaction
+          allLocations.push({
+            index: count,
+            lat: lat,
+            lng: lng,
+            isUmkm: isUmkm,
+            data: d,
+            marker: marker
+          });
+
+          // When marker popup opens, highlight the corresponding sidebar item
+          marker.on('click', () => {
+            const idx = allLocations.findIndex(l => l.marker === marker);
+            if (idx >= 0) {
+              activeItemIndex = idx;
+              document.querySelectorAll('.loc-item').forEach(el => el.classList.remove('active'));
+              const el = document.querySelector('[data-index="' + idx + '"]');
+              if (el) {
+                el.classList.add('active');
+                el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+              }
+            }
+          });
+
+          count++;
+        });
+
+        document.getElementById('markerNum').textContent = count;
+        document.getElementById('markerCount').classList.remove('hidden');
+
+        // Render sidebar list
+        renderSidebarList('all', '');
+
+        // Auto-fit bounds if there are markers
+        if (allLocations.length > 0) {
+          const group = L.featureGroup(allLocations.map(l => l.marker));
+          map.fitBounds(group.getBounds().pad(0.2));
+        }
+
+      } catch (err) {
+        console.error('Map load error:', err);
+      } finally {
+        document.getElementById('mapLoading').style.display = 'none';
+      }
+    }
+
+    loadMarkers();
+  </script>
+</body>
+
+</html>

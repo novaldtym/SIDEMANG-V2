@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SI-DEMANG KREBET — Dashboard Analitik</title>
+  <meta name="description" content="Dashboard analitik demografi dan UMKM Desa Krebet, Bantul.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          colors: {
+            brand: { 50: '#ecfdf5', 100: '#d1fae5', 200: '#a7f3d0', 300: '#6ee7b7', 400: '#34d399', 500: '#10b981', 600: '#059669', 700: '#047857', 800: '#065f46', 900: '#064e3b', 950: '#022c22' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .glass {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-fadeUp {
+      animation: fadeUp 0.5s ease-out both;
+    }
+
+    @keyframes pulse-dot {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: .4
+      }
+    }
+
+    .pulse-dot {
+      animation: pulse-dot 1.5s ease-in-out infinite;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen bg-gradient-to-br from-brand-950 via-brand-900 to-emerald-800 text-gray-800">
+
+  <!-- NAVBAR -->
+  <nav class="sticky top-0 z-50 glass border-b border-white/20 shadow-lg">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2">
+        <div class="w-9 h-9 rounded-lg bg-brand-600 flex items-center justify-center shadow">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M12 21c-4.97 0-9-2.686-9-6V9c0-3.314 4.03-6 9-6s9 2.686 9 6v6c0 3.314-4.03 6-9 6z" />
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M12 11c2.21 0 4-1.343 4-3s-1.79-3-4-3-4 1.343-4 3 1.79 3 4 3z" />
+          </svg>
+        </div>
+        <span class="font-extrabold text-brand-900 text-lg tracking-tight">SI-DEMANG</span>
+      </a>
+      <div class="hidden sm:flex items-center gap-1">
+        <a href="index.html"
+          class="px-3 py-1.5 rounded-lg text-sm font-medium text-brand-800 hover:bg-brand-100 transition">Input Data</a>
+        <a href="dashboard.html"
+          class="px-3 py-1.5 rounded-lg text-sm font-semibold bg-brand-600 text-white shadow">Dashboard</a>
+        <a href="map.html"
+          class="px-3 py-1.5 rounded-lg text-sm font-medium text-brand-800 hover:bg-brand-100 transition">Peta</a>
+      </div>
+      <button id="mobileMenuBtn" class="sm:hidden p-2 rounded-lg hover:bg-brand-100 transition">
+        <svg class="w-6 h-6 text-brand-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </div>
+    <div id="mobileMenu" class="hidden sm:hidden px-4 pb-3 space-y-1">
+      <a href="index.html"
+        class="block px-3 py-2 rounded-lg text-sm font-medium text-brand-800 hover:bg-brand-100">Input Data</a>
+      <a href="dashboard.html"
+        class="block px-3 py-2 rounded-lg text-sm font-semibold bg-brand-600 text-white">Dashboard</a>
+      <a href="map.html"
+        class="block px-3 py-2 rounded-lg text-sm font-medium text-brand-800 hover:bg-brand-100">Peta</a>
+    </div>
+  </nav>
+
+  <!-- HEADER -->
+  <header class="max-w-6xl mx-auto px-4 pt-10 pb-4 animate-fadeUp">
+    <h1 class="text-3xl sm:text-4xl font-extrabold text-white drop-shadow-lg">📊 Dashboard Analitik</h1>
+    <p class="mt-2 text-brand-200 text-sm sm:text-base">Ringkasan data demografi dan UMKM Desa Krebet secara real-time.
+    </p>
+  </header>
+
+  <!-- LOADING STATE -->
+  <div id="loadingState" class="max-w-6xl mx-auto px-4 py-20 text-center">
+    <div class="inline-flex items-center gap-2 px-5 py-3 glass rounded-xl shadow-lg">
+      <span class="w-2 h-2 rounded-full bg-brand-500 pulse-dot"></span>
+      <span class="w-2 h-2 rounded-full bg-brand-500 pulse-dot" style="animation-delay:0.3s"></span>
+      <span class="w-2 h-2 rounded-full bg-brand-500 pulse-dot" style="animation-delay:0.6s"></span>
+      <span class="ml-2 text-sm font-medium text-brand-800">Memuat data...</span>
+    </div>
+  </div>
+
+  <!-- ERROR STATE -->
+  <div id="errorState" class="hidden max-w-6xl mx-auto px-4 py-20 text-center">
+    <div class="inline-block px-6 py-4 glass rounded-xl shadow-lg">
+      <p class="text-red-600 font-semibold">❌ Gagal memuat data</p>
+      <p id="errorMsg" class="text-sm text-gray-600 mt-1"></p>
+      <button onclick="loadData()"
+        class="mt-3 px-4 py-1.5 rounded-lg bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 transition">Coba
+        Lagi</button>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <main id="mainContent" class="hidden max-w-6xl mx-auto px-4 pb-16 space-y-6 animate-fadeUp"
+    style="animation-delay:0.15s">
+
+    <!-- STAT CARDS -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="glass rounded-2xl p-5 border border-white/30 shadow-xl text-center">
+        <p class="text-xs font-semibold text-brand-600 uppercase tracking-wider">Total Warga</p>
+        <p id="statTotal" class="text-3xl font-extrabold text-brand-900 mt-1">0</p>
+      </div>
+      <div class="glass rounded-2xl p-5 border border-white/30 shadow-xl text-center">
+        <p class="text-xs font-semibold text-amber-600 uppercase tracking-wider">Pelaku UMKM</p>
+        <p id="statUmkm" class="text-3xl font-extrabold text-brand-900 mt-1">0</p>
+      </div>
+      <div class="glass rounded-2xl p-5 border border-white/30 shadow-xl text-center">
+        <p class="text-xs font-semibold text-blue-600 uppercase tracking-wider">Jumlah RT</p>
+        <p id="statRT" class="text-3xl font-extrabold text-brand-900 mt-1">0</p>
+      </div>
+      <div class="glass rounded-2xl p-5 border border-white/30 shadow-xl text-center">
+        <p class="text-xs font-semibold text-purple-600 uppercase tracking-wider">Rata-rata Usia</p>
+        <p id="statAvgAge" class="text-3xl font-extrabold text-brand-900 mt-1">0</p>
+      </div>
+    </div>
+
+    <!-- CHARTS ROW -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- PIE: Age Distribution -->
+      <div class="glass rounded-2xl p-6 border border-white/30 shadow-xl">
+        <h2 class="text-lg font-bold text-brand-900 mb-4">🎂 Distribusi Usia</h2>
+        <div class="relative" style="max-height:340px">
+          <canvas id="ageChart"></canvas>
+        </div>
+      </div>
+
+      <!-- BAR: UMKM Types -->
+      <div class="glass rounded-2xl p-6 border border-white/30 shadow-xl">
+        <h2 class="text-lg font-bold text-brand-900 mb-4">🏪 Jenis UMKM</h2>
+        <div class="relative" style="max-height:340px">
+          <canvas id="umkmChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXTRA CHARTS -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- BAR: Pekerjaan -->
+      <div class="glass rounded-2xl p-6 border border-white/30 shadow-xl">
+        <h2 class="text-lg font-bold text-brand-900 mb-4">💼 Distribusi Pekerjaan</h2>
+        <div class="relative" style="max-height:340px">
+          <canvas id="jobChart"></canvas>
+        </div>
+      </div>
+
+      <!-- BAR: Per RT -->
+      <div class="glass rounded-2xl p-6 border border-white/30 shadow-xl">
+        <h2 class="text-lg font-bold text-brand-900 mb-4">🏘️ Jumlah Warga per RT</h2>
+        <div class="relative" style="max-height:340px">
+          <canvas id="rtChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- DATA TABLE -->
+    <div class="glass rounded-2xl border border-white/30 shadow-xl overflow-hidden">
+      <div class="p-5 border-b border-gray-200">
+        <h2 class="text-lg font-bold text-brand-900">📝 Data Terbaru</h2>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left">
+          <thead class="bg-brand-50 text-brand-800 uppercase text-xs tracking-wider">
+            <tr>
+              <th class="px-4 py-3">#</th>
+              <th class="px-4 py-3">Nama</th>
+              <th class="px-4 py-3">RT</th>
+              <th class="px-4 py-3">Usia</th>
+              <th class="px-4 py-3">Pekerjaan</th>
+              <th class="px-4 py-3">UMKM</th>
+            </tr>
+          </thead>
+          <tbody id="dataTableBody" class="divide-y divide-gray-100"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="text-center py-6 text-brand-300 text-xs">
+    &copy; 2026 KKN UPN "Veteran" Yogyakarta — Desa Krebet, Pajangan, Bantul
+  </footer>
+
+  <script>
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbwOiK7_-CV3SfPBt2fl6yYDiMMCV2LB6QXV2OQDQxMtki7FFWu61twVribaGJYWVwPT/exec';
+
+    document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+      document.getElementById('mobileMenu').classList.toggle('hidden');
+    });
+
+    let ageChart, umkmChart, jobChart, rtChart;
+
+    async function loadData() {
+      document.getElementById('loadingState').classList.remove('hidden');
+      document.getElementById('errorState').classList.add('hidden');
+      document.getElementById('mainContent').classList.add('hidden');
+
+      try {
+        const res = await fetch(GAS_URL);
+        const json = await res.json();
+        if (!json.success) throw new Error(json.error || 'Unknown error');
+        renderDashboard(json.data);
+      } catch (err) {
+        document.getElementById('loadingState').classList.add('hidden');
+        document.getElementById('errorState').classList.remove('hidden');
+        document.getElementById('errorMsg').textContent = err.message;
+      }
+    }
+
+    function renderDashboard(data) {
+      document.getElementById('loadingState').classList.add('hidden');
+      document.getElementById('mainContent').classList.remove('hidden');
+
+      // --- STATS ---
+      const total = data.length;
+      const umkmCount = data.filter(d => d.Jenis_UMKM && d.Jenis_UMKM !== '-').length;
+      const rtSet = new Set(data.map(d => d.RT));
+      const avgAge = total ? (data.reduce((s, d) => s + Number(d.Usia || 0), 0) / total).toFixed(0) : 0;
+
+      document.getElementById('statTotal').textContent = total;
+      document.getElementById('statUmkm').textContent = umkmCount;
+      document.getElementById('statRT').textContent = rtSet.size;
+      document.getElementById('statAvgAge').textContent = avgAge;
+
+      // --- AGE PIE ---
+      const ageGroups = { 'Anak (0-14)': 0, 'Remaja (15-24)': 0, 'Dewasa (25-44)': 0, 'Paruh Baya (45-59)': 0, 'Lansia (60+)': 0 };
+      data.forEach(d => {
+        const u = Number(d.Usia || 0);
+        if (u <= 14) ageGroups['Anak (0-14)']++;
+        else if (u <= 24) ageGroups['Remaja (15-24)']++;
+        else if (u <= 44) ageGroups['Dewasa (25-44)']++;
+        else if (u <= 59) ageGroups['Paruh Baya (45-59)']++;
+        else ageGroups['Lansia (60+)']++;
+      });
+
+      if (ageChart) ageChart.destroy();
+      ageChart = new Chart(document.getElementById('ageChart'), {
+        type: 'doughnut',
+        data: {
+          labels: Object.keys(ageGroups),
+          datasets: [{ data: Object.values(ageGroups), backgroundColor: ['#6ee7b7', '#34d399', '#10b981', '#059669', '#065f46'], borderWidth: 2, borderColor: '#fff' }]
+        },
+        options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { padding: 12, usePointStyle: true, font: { size: 11 } } } } }
+      });
+
+      // --- UMKM BAR ---
+      const umkmMap = {};
+      data.forEach(d => {
+        const j = d.Jenis_UMKM;
+        if (j && j !== '-') umkmMap[j] = (umkmMap[j] || 0) + 1;
+      });
+      const umkmLabels = Object.keys(umkmMap);
+      const umkmValues = Object.values(umkmMap);
+
+      if (umkmChart) umkmChart.destroy();
+      umkmChart = new Chart(document.getElementById('umkmChart'), {
+        type: 'bar',
+        data: {
+          labels: umkmLabels,
+          datasets: [{ label: 'Jumlah', data: umkmValues, backgroundColor: '#10b981', borderRadius: 8, barThickness: 28 }]
+        },
+        options: { responsive: true, maintainAspectRatio: true, indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+      });
+
+      // --- JOB BAR ---
+      const jobMap = {};
+      data.forEach(d => { const p = d.Pekerjaan || 'Lainnya'; jobMap[p] = (jobMap[p] || 0) + 1; });
+
+      if (jobChart) jobChart.destroy();
+      jobChart = new Chart(document.getElementById('jobChart'), {
+        type: 'bar',
+        data: {
+          labels: Object.keys(jobMap),
+          datasets: [{ label: 'Jumlah', data: Object.values(jobMap), backgroundColor: '#3b82f6', borderRadius: 8, barThickness: 28 }]
+        },
+        options: { responsive: true, maintainAspectRatio: true, indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+      });
+
+      // --- RT BAR ---
+      const rtMap = {};
+      data.forEach(d => { const r = 'RT ' + (d.RT || '?'); rtMap[r] = (rtMap[r] || 0) + 1; });
+      const rtLabels = Object.keys(rtMap).sort();
+
+      if (rtChart) rtChart.destroy();
+      rtChart = new Chart(document.getElementById('rtChart'), {
+        type: 'bar',
+        data: {
+          labels: rtLabels,
+          datasets: [{ label: 'Warga', data: rtLabels.map(l => rtMap[l]), backgroundColor: '#8b5cf6', borderRadius: 8 }]
+        },
+        options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+      });
+
+      // --- TABLE ---
+      const tbody = document.getElementById('dataTableBody');
+      tbody.innerHTML = '';
+      const latest = data.slice(-20).reverse();
+      latest.forEach((d, i) => {
+        const umkmBadge = (d.Jenis_UMKM && d.Jenis_UMKM !== '-')
+          ? '<span class="px-2 py-0.5 rounded-full bg-brand-100 text-brand-700 text-xs font-medium">' + d.Jenis_UMKM + '</span>'
+          : '<span class="text-gray-400">-</span>';
+        tbody.innerHTML += '<tr class="hover:bg-brand-50/50 transition"><td class="px-4 py-3 text-gray-500">' + (i + 1) + '</td><td class="px-4 py-3 font-medium text-brand-900">' + (d.Nama_Lengkap || '-') + '</td><td class="px-4 py-3">' + (d.RT || '-') + '</td><td class="px-4 py-3">' + (d.Usia || '-') + '</td><td class="px-4 py-3">' + (d.Pekerjaan || '-') + '</td><td class="px-4 py-3">' + umkmBadge + '</td></tr>';
+      });
+    }
+
+    loadData();
+  </script>
+</body>
+
+</html>
