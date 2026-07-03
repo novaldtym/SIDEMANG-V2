@@ -1,470 +1,724 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SI-DEMANG KREBET — Peta Digital</title>
-  <meta name="description" content="Peta digital WebGIS demografi dan sebaran UMKM Desa Krebet, Bantul.">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peta Digital — SI-DEMANG Krebet</title>
+
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- TailwindCSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
     tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
-          colors: {
-            brand: { 50: '#ecfdf5', 100: '#d1fae5', 200: '#a7f3d0', 300: '#6ee7b7', 400: '#34d399', 500: '#10b981', 600: '#059669', 700: '#047857', 800: '#065f46', 900: '#064e3b', 950: '#022c22' }
-          }
+        theme: {
+            extend: {
+                fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+                colors: {
+                    primary: '#069C67',
+                    'primary-dark': '#057a52',
+                    accent: '#EFB3D1',
+                    'accent-dark': '#e091b8'
+                }
+            }
         }
-      }
     }
-  </script>
-  <style>
-    body { font-family: 'Inter', system-ui, sans-serif; margin: 0; overflow: hidden; }
-    .glass { background: rgba(255,255,255,0.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+    </script>
 
-    /* Layout */
-    .map-wrapper { display: flex; height: calc(100vh - 56px); position: relative; }
-    #map { flex: 1; height: 100%; min-width: 0; }
+    <!-- Leaflet 1.9.4 -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    /* Sidebar */
-    .sidebar {
-      width: 380px; height: 100%; background: #fff; border-left: 1px solid #e5e7eb;
-      display: flex; flex-direction: column; z-index: 800; flex-shrink: 0;
-      transition: margin-right 0.3s ease;
-    }
-    .sidebar.collapsed { margin-right: -380px; }
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+        body { margin: 0; padding: 0; font-family: 'Inter', system-ui, sans-serif; background: #FFFFFF; overflow: hidden; }
 
-    /* Mobile sidebar overlay */
-    @media (max-width: 767px) {
-      .sidebar {
-        position: absolute; right: 0; top: 0; width: 100%; max-width: 360px;
-        box-shadow: -4px 0 24px rgba(0,0,0,0.15);
-      }
-      .sidebar.collapsed { transform: translateX(100%); margin-right: 0; }
-      .sidebar { transition: transform 0.3s ease; }
-    }
+        /* ── Sidebar ── */
+        .sidebar {
+            position: fixed; top: 0; left: 0; bottom: 0;
+            width: 16rem; /* w-64 */
+            background: #069C67;
+            color: #fff;
+            display: flex; flex-direction: column;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+        .sidebar-nav a {
+            display: flex; align-items: center; gap: 0.75rem;
+            padding: 0.65rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .sidebar-nav a:hover { background: rgba(255,255,255,0.12); color: #fff; }
+        .sidebar-nav a.active { background: rgba(255,255,255,0.20); font-weight: 600; color: #fff; }
+        .sidebar-nav a img { width: 1.25rem; height: 1.25rem; flex-shrink: 0; }
 
-    /* Toggle button */
-    .sidebar-toggle {
-      position: absolute; right: 380px; top: 12px; z-index: 900;
-      transition: right 0.3s ease;
-    }
-    .sidebar-toggle.shifted { right: 12px; }
-    @media (max-width: 767px) {
-      .sidebar-toggle { right: 12px; }
-      .sidebar-toggle.shifted { right: 12px; }
-    }
+        /* ── Map Container ── */
+        .map-wrapper {
+            margin-left: 16rem;
+            height: 100vh;
+            position: relative;
+            display: flex;
+        }
+        #map { flex: 1; height: 100%; z-index: 1; }
 
-    /* List items */
-    .loc-item {
-      padding: 12px 16px; border-bottom: 1px solid #f3f4f6; cursor: pointer;
-      transition: background 0.15s;
-    }
-    .loc-item:hover { background: #ecfdf5; }
-    .loc-item.active { background: #d1fae5; border-left: 3px solid #059669; }
+        /* ── Right Panel ── */
+        .right-panel {
+            width: 380px;
+            height: 100%;
+            background: #fff;
+            border-left: 1px solid #e5e7eb;
+            display: flex; flex-direction: column;
+            transition: width 0.3s ease, opacity 0.3s ease;
+            overflow: hidden;
+            z-index: 500;
+        }
+        .right-panel.collapsed { width: 0; opacity: 0; pointer-events: none; }
+        .right-panel-header {
+            padding: 1.25rem 1rem 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
+            flex-shrink: 0;
+        }
+        .right-panel-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0;
+        }
 
-    /* Scrollbar */
-    .sidebar-list::-webkit-scrollbar { width: 5px; }
-    .sidebar-list::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+        .panel-toggle-btn {
+            position: absolute;
+            top: 50%;
+            right: 380px;
+            transform: translateY(-50%);
+            z-index: 600;
+            width: 28px; height: 56px;
+            background: #069C67;
+            color: #fff;
+            border: none;
+            border-radius: 8px 0 0 8px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem;
+            box-shadow: -2px 0 8px rgba(0,0,0,0.12);
+            transition: right 0.3s ease;
+        }
+        .panel-toggle-btn.collapsed { right: 0; border-radius: 8px 0 0 8px; }
 
-    /* Leaflet popups */
-    .leaflet-popup-content-wrapper { border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); }
-    .leaflet-popup-content { margin: 12px 16px; font-family: 'Inter', sans-serif; }
-    .custom-popup h3 { font-size: 14px; font-weight: 700; color: #064e3b; margin: 0 0 6px; }
-    .custom-popup p { font-size: 12px; color: #374151; margin: 2px 0; }
-    .custom-popup .badge { display: inline-block; padding: 2px 8px; border-radius: 9999px; font-size: 11px; font-weight: 600; }
-    .custom-popup .badge-umkm { background: #d1fae5; color: #065f46; }
-    .custom-popup .badge-none { background: #f3f4f6; color: #9ca3af; }
+        /* ── Filter Tabs ── */
+        .filter-tabs {
+            display: flex; gap: 0.35rem;
+            padding: 0.75rem 1rem 0.5rem;
+            flex-wrap: wrap;
+        }
+        .filter-tab {
+            padding: 0.35rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1.5px solid #e5e7eb;
+            background: #fff;
+            color: #374151;
+            transition: all 0.2s;
+        }
+        .filter-tab:hover { border-color: #069C67; color: #069C67; }
+        .filter-tab.active { background: #069C67; color: #fff; border-color: #069C67; }
 
-    /* Loading overlay */
-    .map-loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); z-index: 1000; }
-    @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.4} }
-    .pulse-dot { animation: pulse-dot 1.5s ease-in-out infinite; }
+        /* ── List Items ── */
+        .location-item {
+            display: flex; align-items: flex-start; gap: 0.75rem;
+            padding: 0.85rem 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background 0.15s;
+        }
+        .location-item:hover { background: #f0fdf4; }
+        .location-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            margin-top: 5px;
+            flex-shrink: 0;
+        }
+        .location-item-name { font-weight: 600; font-size: 0.85rem; color: #111827; }
+        .location-item-detail { font-size: 0.75rem; color: #6b7280; margin-top: 2px; }
 
-    /* Legend */
-    .legend { background: rgba(255,255,255,0.9); backdrop-filter: blur(8px); padding: 12px 16px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.12); font-size: 12px; line-height: 20px; }
-    .legend h4 { font-weight: 700; font-size: 13px; margin: 0 0 6px; color: #064e3b; }
-    .legend-item { display: flex; align-items: center; gap: 8px; margin: 3px 0; }
-    .legend-dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
-  </style>
+        /* ── Search Input ── */
+        .search-box {
+            width: 100%;
+            padding: 0.6rem 0.85rem 0.6rem 2.4rem;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 0.5rem;
+            font-size: 0.85rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+            background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'/%3E%3C/svg%3E") no-repeat 0.7rem center;
+            background-size: 1rem 1rem;
+        }
+        .search-box:focus { border-color: #069C67; }
+
+        /* ── Legend ── */
+        .map-legend {
+            position: absolute;
+            bottom: 24px; left: 12px;
+            background: #fff;
+            border-radius: 0.75rem;
+            padding: 0.85rem 1rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+            z-index: 800;
+            font-size: 0.78rem;
+        }
+        .legend-item {
+            display: flex; align-items: center; gap: 0.5rem;
+            margin-bottom: 0.35rem;
+        }
+        .legend-item:last-child { margin-bottom: 0; }
+        .legend-dot {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* ── Marker Count Badge ── */
+        .marker-count-badge {
+            position: absolute;
+            top: 12px; left: 12px;
+            background: #069C67;
+            color: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            font-weight: 700;
+            font-size: 0.85rem;
+            z-index: 800;
+            box-shadow: 0 2px 10px rgba(6,156,103,0.3);
+            display: flex; align-items: center; gap: 0.4rem;
+        }
+
+        /* ── Loading Overlay ── */
+        .loading-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(255,255,255,0.88);
+            z-index: 900;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 1rem;
+        }
+        .loading-overlay.hidden { display: none; }
+        .loading-spinner {
+            width: 44px; height: 44px;
+            border: 4px solid #e5e7eb;
+            border-top-color: #069C67;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Popup Styles ── */
+        .leaflet-popup-content-wrapper {
+            border-radius: 0.75rem !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
+            padding: 0 !important;
+        }
+        .leaflet-popup-content {
+            margin: 0 !important;
+            font-family: 'Inter', system-ui, sans-serif !important;
+            min-width: 250px !important;
+        }
+        .popup-badge {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .popup-badge-green { background: #d1fae5; color: #065f46; }
+        .popup-badge-purple { background: #ede9fe; color: #5b21b6; }
+        .popup-badge-gray { background: #f3f4f6; color: #374151; }
+        .popup-badge-blue { background: #dbeafe; color: #1e40af; }
+
+        /* ── Mobile Header ── */
+        .mobile-header {
+            display: none;
+            position: fixed; top: 0; left: 0; right: 0;
+            height: 56px;
+            background: #069C67;
+            color: #fff;
+            z-index: 1100;
+            align-items: center;
+            padding: 0 1rem;
+            gap: 0.75rem;
+        }
+        .hamburger-btn {
+            width: 40px; height: 40px;
+            background: none; border: none; color: #fff;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .hamburger-btn svg { width: 24px; height: 24px; }
+        .mobile-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 999;
+        }
+
+        /* ── Mobile Bottom Nav ── */
+        .mobile-bottom-nav {
+            display: none;
+            position: fixed; bottom: 0; left: 0; right: 0;
+            height: 60px;
+            background: #fff;
+            border-top: 1px solid #e5e7eb;
+            z-index: 1100;
+        }
+        .mobile-bottom-nav a {
+            flex: 1;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 0.2rem;
+            text-decoration: none;
+            font-size: 0.65rem;
+            font-weight: 500;
+            color: #6b7280;
+            transition: color 0.2s;
+        }
+        .mobile-bottom-nav a.active { color: #069C67; font-weight: 700; }
+        .mobile-bottom-nav a img { width: 22px; height: 22px; }
+
+        /* ── Leaflet Overrides ── */
+        .leaflet-control-layers { border-radius: 0.5rem !important; }
+        .leaflet-control-zoom a { border-radius: 0 !important; }
+        .leaflet-control-zoom { border-radius: 0.5rem !important; overflow: hidden; }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 1024px) {
+            .right-panel { width: 320px; }
+            .panel-toggle-btn { right: 320px; }
+            .panel-toggle-btn.collapsed { right: 0; }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+
+            .mobile-header { display: flex; }
+            .mobile-bottom-nav { display: flex; }
+            .mobile-overlay.active { display: block; }
+
+            .map-wrapper {
+                margin-left: 0;
+                height: calc(100vh - 56px - 60px);
+                margin-top: 56px;
+            }
+
+            .right-panel { width: 100%; position: absolute; right: 0; top: 0; bottom: 0; }
+            .right-panel.collapsed { width: 0; }
+            .panel-toggle-btn { right: 0; }
+            .panel-toggle-btn:not(.collapsed) { right: 100%; }
+
+            .marker-count-badge { top: 10px; left: 10px; font-size: 0.78rem; padding: 0.4rem 0.8rem; }
+            .map-legend { bottom: 16px; left: 10px; }
+        }
+    </style>
 </head>
+<body>
 
-<body class="bg-gray-100">
+<!-- ═══════════════ MOBILE HEADER ═══════════════ -->
+<header class="mobile-header">
+    <button class="hamburger-btn" id="hamburgerBtn" aria-label="Menu">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+    </button>
+    <span class="font-bold text-lg tracking-tight">SI-DEMANG</span>
+</header>
 
-  <!-- NAVBAR -->
-  <nav class="sticky top-0 z-[1100] glass border-b border-white/20 shadow-lg">
-    <div class="max-w-full mx-auto px-4 py-3 flex items-center justify-between">
-      <a href="index.html" class="flex items-center gap-2">
-        <div class="w-9 h-9 rounded-lg bg-brand-600 flex items-center justify-center shadow">
-          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M12 21c-4.97 0-9-2.686-9-6V9c0-3.314 4.03-6 9-6s9 2.686 9 6v6c0 3.314-4.03 6-9 6z" />
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M12 11c2.21 0 4-1.343 4-3s-1.79-3-4-3-4 1.343-4 3 1.79 3 4 3z" />
-          </svg>
+<!-- ═══════════════ MOBILE OVERLAY ═══════════════ -->
+<div class="mobile-overlay" id="mobileOverlay"></div>
+
+<!-- ═══════════════ LEFT SIDEBAR ═══════════════ -->
+<aside class="sidebar" id="sidebar">
+    <!-- Top Logo -->
+    <div class="flex flex-col items-center pt-8 pb-6 px-4">
+        <img src="assets/logo-krebetter.png" class="w-20 h-20 mx-auto rounded-full bg-white p-1" alt="Logo Krebet">
+        <h1 class="text-xl font-extrabold tracking-tight mt-3">SI-DEMANG</h1>
+        <p class="text-xs text-white/70 mt-0.5">Desa Krebet, Jambon, Ponorogo</p>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="sidebar-nav flex flex-col gap-1 px-3 flex-1">
+        <a href="index.html">
+            <img src="assets/icon-dashboard.png" alt="Dashboard">
+            <span>Dashboard</span>
+        </a>
+        <a href="demografi.html">
+            <img src="assets/icon-demografi.png" alt="Demografi">
+            <span>Demografi</span>
+        </a>
+        <a href="map.html" class="active">
+            <img src="assets/icon-peta.png" alt="Peta">
+            <span>Peta Digital</span>
+        </a>
+    </nav>
+
+    <!-- Footer -->
+    <div class="px-4 pb-5 mt-auto">
+        <div class="flex items-center justify-center gap-3 mb-3">
+            <img src="assets/logo-upn.png" alt="UPN" class="w-8 h-8 rounded-full bg-white p-0.5">
+            <img src="assets/logo-krebet.png" alt="Krebet" class="w-8 h-8 rounded-full bg-white p-0.5">
         </div>
-        <span class="font-extrabold text-brand-900 text-lg tracking-tight">SI-DEMANG</span>
-      </a>
-      <div class="hidden sm:flex items-center gap-1">
-        <a href="index.html"
-          class="px-3 py-1.5 rounded-lg text-sm font-medium text-brand-800 hover:bg-brand-100 transition">Input Data</a>
-        <a href="dashboard.html"
-          class="px-3 py-1.5 rounded-lg text-sm font-medium text-brand-800 hover:bg-brand-100 transition">Dashboard</a>
-        <a href="map.html" class="px-3 py-1.5 rounded-lg text-sm font-semibold bg-brand-600 text-white shadow">Peta</a>
-      </div>
-      <div class="flex items-center gap-2">
-        <span id="markerCount"
-          class="hidden sm:inline-flex items-center gap-1 px-3 py-1 rounded-full bg-brand-100 text-brand-700 text-xs font-semibold">
-          <span class="w-2 h-2 rounded-full bg-brand-500"></span> <span id="markerNum">0</span> titik
-        </span>
-        <button id="mobileMenuBtn" class="sm:hidden p-2 rounded-lg hover:bg-brand-100 transition">
-          <svg class="w-6 h-6 text-brand-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
-      </div>
+        <p class="text-[0.65rem] text-white/50 text-center">&copy; 2026 KKN UPN Veteran Jatim</p>
     </div>
-    <div id="mobileMenu" class="hidden sm:hidden px-4 pb-3 space-y-1">
-      <a href="index.html"
-        class="block px-3 py-2 rounded-lg text-sm font-medium text-brand-800 hover:bg-brand-100">Input Data</a>
-      <a href="dashboard.html"
-        class="block px-3 py-2 rounded-lg text-sm font-medium text-brand-800 hover:bg-brand-100">Dashboard</a>
-      <a href="map.html" class="block px-3 py-2 rounded-lg text-sm font-semibold bg-brand-600 text-white">Peta</a>
-    </div>
-  </nav>
+</aside>
 
-  <!-- MAP + SIDEBAR LAYOUT -->
-  <div class="map-wrapper">
+<!-- ═══════════════ MOBILE BOTTOM NAV ═══════════════ -->
+<nav class="mobile-bottom-nav" id="mobileBottomNav">
+    <a href="index.html">
+        <img src="assets/icon-dashboard.png" alt="Dashboard">
+        <span>Dashboard</span>
+    </a>
+    <a href="demografi.html">
+        <img src="assets/icon-demografi.png" alt="Demografi">
+        <span>Demografi</span>
+    </a>
+    <a href="map.html" class="active">
+        <img src="assets/icon-peta.png" alt="Peta">
+        <span>Peta</span>
+    </a>
+</nav>
+
+<!-- ═══════════════ MAIN MAP AREA ═══════════════ -->
+<div class="map-wrapper" id="mapWrapper">
 
     <!-- Map -->
-    <div style="position:relative; flex:1; min-width:0;">
-      <div id="map"></div>
-      <!-- Loading overlay -->
-      <div id="mapLoading" class="map-loading">
-        <div class="glass rounded-xl px-5 py-3 shadow-xl flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-brand-500 pulse-dot"></span>
-          <span class="w-2 h-2 rounded-full bg-brand-500 pulse-dot" style="animation-delay:0.3s"></span>
-          <span class="w-2 h-2 rounded-full bg-brand-500 pulse-dot" style="animation-delay:0.6s"></span>
-          <span class="ml-1 text-sm font-medium text-brand-800">Memuat peta...</span>
-        </div>
-      </div>
+    <div id="map"></div>
+
+    <!-- Marker Count Badge -->
+    <div class="marker-count-badge" id="markerCountBadge">
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
+        <span id="markerCountText">0 Titik</span>
     </div>
 
-    <!-- Sidebar Toggle Button -->
-    <button id="sidebarToggle" class="sidebar-toggle"
-      title="Toggle Daftar Lokasi">
-      <div class="bg-white shadow-lg rounded-lg px-3 py-2 flex items-center gap-2 hover:bg-brand-50 transition border border-gray-200">
-        <svg id="toggleIconList" class="w-5 h-5 text-brand-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
-        </svg>
-        <svg id="toggleIconClose" class="w-5 h-5 text-brand-700 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-        </svg>
-        <span class="text-xs font-semibold text-brand-800 hidden sm:inline" id="toggleLabel">Daftar Lokasi</span>
-      </div>
-    </button>
-
-    <!-- Sidebar Panel -->
-    <div id="sidebar" class="sidebar collapsed">
-      <!-- Sidebar Header -->
-      <div class="px-4 py-3 border-b border-gray-200 bg-brand-50 flex-shrink-0">
-        <div class="flex items-center justify-between mb-3">
-          <h2 class="text-base font-bold text-brand-900 flex items-center gap-2">
-            <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"/>
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-            </svg>
-            Daftar Lokasi
-          </h2>
-          <span id="sidebarCount" class="text-xs font-semibold text-brand-600 bg-brand-100 px-2 py-0.5 rounded-full">0</span>
+    <!-- Legend -->
+    <div class="map-legend">
+        <div class="font-semibold text-xs text-gray-700 mb-2">Legenda</div>
+        <div class="legend-item">
+            <span class="legend-dot" style="background:#069C67;"></span>
+            <span class="text-gray-700">UMKM</span>
         </div>
-        <!-- Search -->
-        <div class="relative">
-          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="m21 21-4.35-4.35"/>
-          </svg>
-          <input type="text" id="searchInput" placeholder="Cari nama atau UMKM..."
-            class="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-gray-300 bg-white focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition">
+        <div class="legend-item">
+            <span class="legend-dot" style="background:#8b5cf6;"></span>
+            <span class="text-gray-700">Pembatik</span>
         </div>
-        <!-- Filter Tabs -->
-        <div class="flex gap-1 mt-2">
-          <button data-filter="all" class="filter-tab active-tab px-3 py-1 rounded-full text-xs font-semibold transition">Semua</button>
-          <button data-filter="umkm" class="filter-tab px-3 py-1 rounded-full text-xs font-semibold transition">🏪 UMKM</button>
-          <button data-filter="warga" class="filter-tab px-3 py-1 rounded-full text-xs font-semibold transition">🏘️ Warga</button>
+        <div class="legend-item">
+            <span class="legend-dot" style="background:#6b7280;"></span>
+            <span class="text-gray-700">Warga</span>
         </div>
-      </div>
-
-      <!-- Sidebar List -->
-      <div id="sidebarList" class="sidebar-list flex-1 overflow-y-auto">
-        <!-- Items will be injected here -->
-      </div>
-
-      <!-- Sidebar Footer -->
-      <div class="px-4 py-2 border-t border-gray-200 bg-gray-50 flex-shrink-0">
-        <p class="text-xs text-gray-500 text-center">Klik item untuk zoom ke lokasi</p>
-      </div>
     </div>
-  </div>
 
-  <style>
-    .filter-tab { background: #f3f4f6; color: #6b7280; }
-    .filter-tab:hover { background: #e5e7eb; }
-    .filter-tab.active-tab { background: #059669; color: #fff; }
-  </style>
+    <!-- Panel Toggle Button -->
+    <button class="panel-toggle-btn" id="panelToggleBtn" title="Toggle Panel">❮</button>
 
-  <script>
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycbwOiK7_-CV3SfPBt2fl6yYDiMMCV2LB6QXV2OQDQxMtki7FFWu61twVribaGJYWVwPT/exec';
+    <!-- Right Data Panel -->
+    <div class="right-panel" id="rightPanel">
+        <div class="right-panel-header">
+            <h2 class="font-bold text-sm text-gray-800 mb-2">📍 Daftar Lokasi</h2>
+            <input type="text" class="search-box" id="searchInput" placeholder="Cari nama atau RT...">
+        </div>
+        <div class="filter-tabs" id="filterTabs">
+            <button class="filter-tab active" data-filter="all">Semua</button>
+            <button class="filter-tab" data-filter="umkm">🏪 UMKM</button>
+            <button class="filter-tab" data-filter="pembatik">🎨 Pembatik</button>
+            <button class="filter-tab" data-filter="warga">👤 Warga</button>
+        </div>
+        <div class="right-panel-body" id="locationList">
+            <!-- Dynamically populated -->
+        </div>
+    </div>
 
-    // Mobile menu
-    document.getElementById('mobileMenuBtn').addEventListener('click', () => {
-      document.getElementById('mobileMenu').classList.toggle('hidden');
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <p class="text-sm font-semibold text-gray-600">Memuat data peta…</p>
+    </div>
+
+</div>
+
+<script>
+// ─── Constants ───
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwOiK7_-CV3SfPBt2fl6yYDiMMCV2LB6QXV2OQDQxMtki7FFWu61twVribaGJYWVwPT/exec';
+const KREBET_CENTER = [-7.8703, 110.3150];
+const ZOOM_DEFAULT = 15;
+
+// ─── Marker Colors ───
+const COLORS = {
+    umkm:     '#069C67',
+    pembatik: '#8b5cf6',
+    regular:  '#6b7280'
+};
+
+// ─── DOM Elements ───
+const mapEl           = document.getElementById('map');
+const loadingOverlay  = document.getElementById('loadingOverlay');
+const markerCountText = document.getElementById('markerCountText');
+const searchInput     = document.getElementById('searchInput');
+const locationList    = document.getElementById('locationList');
+const rightPanel      = document.getElementById('rightPanel');
+const panelToggleBtn  = document.getElementById('panelToggleBtn');
+const filterTabs      = document.getElementById('filterTabs');
+const hamburgerBtn    = document.getElementById('hamburgerBtn');
+const sidebar         = document.getElementById('sidebar');
+const mobileOverlay   = document.getElementById('mobileOverlay');
+
+// ─── State ───
+let allData = [];
+let markers = {};
+let activeFilter = 'all';
+let map;
+
+// ─── Initialize Map ───
+function initMap() {
+    map = L.map('map', {
+        center: KREBET_CENTER,
+        zoom: ZOOM_DEFAULT,
+        zoomControl: false
     });
 
-    // Initialize map centered on Krebet, Bantul
-    const map = L.map('map', { zoomControl: false }).setView([-7.8703, 110.3150], 15);
+    // Tile Layers
+    const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors',
+        maxZoom: 19
+    });
+
+    const esriSatellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: '&copy; Esri',
+        maxZoom: 19
+    });
+
+    osmLayer.addTo(map);
+
+    L.control.layers(
+        { 'OpenStreetMap': osmLayer, 'Satelit (Esri)': esriSatellite },
+        null,
+        { position: 'topright' }
+    ).addTo(map);
+
     L.control.zoom({ position: 'topright' }).addTo(map);
 
-    // Tile layers
-    const osmLight = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
-    });
-    const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-      maxZoom: 19, attribution: '&copy; Esri'
-    });
-    osmLight.addTo(map);
-    L.control.layers({ 'Peta': osmLight, 'Satelit': satellite }, null, { position: 'topright' }).addTo(map);
+    loadData();
+}
 
-    // Custom marker icon
-    function createIcon(isUmkm) {
-      const color = isUmkm ? '#059669' : '#6b7280';
-      return L.divIcon({
-        className: '',
-        html: '<div style="width:28px;height:28px;border-radius:50% 50% 50% 0;background:' + color + ';transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center"><div style="width:8px;height:8px;background:#fff;border-radius:50%;transform:rotate(45deg)"></div></div>',
+// ─── Create Marker Icon ───
+function createMarkerIcon(color) {
+    return L.divIcon({
+        className: 'custom-marker',
+        html: `<div style="
+            width: 28px; height: 28px;
+            background: ${color};
+            border: 3px solid #fff;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+        "></div>`,
         iconSize: [28, 28],
-        iconAnchor: [14, 28],
-        popupAnchor: [0, -30]
-      });
-    }
-
-    // Legend
-    const legend = L.control({ position: 'bottomleft' });
-    legend.onAdd = function () {
-      const div = L.DomUtil.create('div', 'legend');
-      div.innerHTML = '<h4>Legenda</h4>'
-        + '<div class="legend-item"><span class="legend-dot" style="background:#059669"></span> Pelaku UMKM</div>'
-        + '<div class="legend-item"><span class="legend-dot" style="background:#6b7280"></span> Non-UMKM</div>';
-      return div;
-    };
-    legend.addTo(map);
-
-    // ============================================================
-    // SIDEBAR LOGIC
-    // ============================================================
-    const sidebar = document.getElementById('sidebar');
-    const sidebarToggle = document.getElementById('sidebarToggle');
-    const toggleIconList = document.getElementById('toggleIconList');
-    const toggleIconClose = document.getElementById('toggleIconClose');
-    const toggleLabel = document.getElementById('toggleLabel');
-    let sidebarOpen = false;
-
-    sidebarToggle.addEventListener('click', () => {
-      sidebarOpen = !sidebarOpen;
-      sidebar.classList.toggle('collapsed', !sidebarOpen);
-      sidebarToggle.classList.toggle('shifted', !sidebarOpen);
-      toggleIconList.classList.toggle('hidden', sidebarOpen);
-      toggleIconClose.classList.toggle('hidden', !sidebarOpen);
-      toggleLabel.textContent = sidebarOpen ? 'Tutup' : 'Daftar Lokasi';
-      // Invalidate map size after sidebar animation
-      setTimeout(() => map.invalidateSize(), 350);
+        iconAnchor: [14, 14],
+        popupAnchor: [0, -16]
     });
+}
 
-    // Store all location data and markers for interaction
-    let allLocations = [];
-    let activeItemIndex = -1;
+// ─── Classify Person ───
+function classifyPerson(row) {
+    if (row.Pembatik === 'Ya') return 'pembatik';
+    if (row.Jenis_UMKM && row.Jenis_UMKM !== '-' && row.Jenis_UMKM.toUpperCase() !== 'TIDAK ADA') return 'umkm';
+    return 'regular';
+}
 
-    // Build popup HTML
-    function buildPopupHtml(d, isUmkm) {
-      const umkmBadge = isUmkm
-        ? '<span class="badge badge-umkm">' + d.Jenis_UMKM + '</span>'
-        : '<span class="badge badge-none">Tidak ada</span>';
-      return '<div class="custom-popup">'
-        + '<h3>' + (d.Nama_Lengkap || '-') + '</h3>'
-        + '<p>🏘️ RT ' + (d.RT || '-') + ' &nbsp;|&nbsp; 🎂 ' + (d.Usia || '-') + ' tahun</p>'
-        + '<p>💼 ' + (d.Pekerjaan || '-') + '</p>'
-        + '<p style="margin-top:6px">🏪 UMKM: ' + umkmBadge + '</p>'
-        + '</div>';
-    }
+// ─── Get Color for Classification ───
+function getColor(type) {
+    return COLORS[type] || COLORS.regular;
+}
 
-    // Fly to a location and open popup
-    function flyToLocation(index) {
-      const loc = allLocations[index];
-      if (!loc) return;
+// ─── Build Popup HTML ───
+function buildPopup(row) {
+    const lat = parseFloat(row.Latitude);
+    const lng = parseFloat(row.Longitude);
+    const routeUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+    const type = classifyPerson(row);
 
-      // Highlight active item in sidebar
-      document.querySelectorAll('.loc-item').forEach(el => el.classList.remove('active'));
-      const activeEl = document.querySelector('[data-index="' + index + '"]');
-      if (activeEl) {
-        activeEl.classList.add('active');
-        activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
-      activeItemIndex = index;
+    const umkmVal = (row.Jenis_UMKM && row.Jenis_UMKM !== '-' && row.Jenis_UMKM.toUpperCase() !== 'TIDAK ADA') ? row.Jenis_UMKM : 'Tidak Ada';
+    const pembatikVal = row.Pembatik || '-';
+    const bantuanVal = (row.Bantuan && row.Bantuan !== '-' && row.Bantuan.toUpperCase() !== 'TIDAK ADA') ? row.Bantuan : 'Tidak Ada';
 
-      // Fly to location and open popup
-      map.flyTo([loc.lat, loc.lng], 18, { duration: 1.2 });
-      setTimeout(() => { loc.marker.openPopup(); }, 1300);
-    }
+    const umkmBadgeClass = umkmVal !== 'Tidak Ada' ? 'popup-badge popup-badge-green' : 'popup-badge popup-badge-gray';
+    const pembatikBadgeClass = pembatikVal === 'Ya' ? 'popup-badge popup-badge-purple' : 'popup-badge popup-badge-gray';
+    const bantuanBadgeClass = bantuanVal !== 'Tidak Ada' ? 'popup-badge popup-badge-blue' : 'popup-badge popup-badge-gray';
 
-    // Render sidebar list
-    function renderSidebarList(filter, searchQuery) {
-      const list = document.getElementById('sidebarList');
-      list.innerHTML = '';
+    return `
+        <div style="font-family:'Inter',system-ui,sans-serif; padding: 16px; min-width: 240px;">
+            <h3 style="font-weight:700; font-size:1rem; color:#111827; margin:0 0 6px 0;">${row.Nama_Lengkap || '-'}</h3>
+            <p style="font-size:0.85rem; color:#6b7280; margin:0 0 3px;">RT ${row.RT || '-'} · ${row.Usia || '-'} tahun · ${row.Jenis_Kelamin || '-'}</p>
+            <p style="font-size:0.85rem; color:#6b7280; margin:0 0 3px;">💼 ${row.Pekerjaan || '-'}</p>
+            <p style="font-size:0.85rem; color:#6b7280; margin:0 0 8px;">🎓 ${row.Pendidikan || '-'}</p>
+            <p style="font-size:0.85rem; margin:0 0 4px;">🏪 UMKM: <span class="${umkmBadgeClass}">${umkmVal}</span></p>
+            <p style="font-size:0.85rem; margin:0 0 4px;">🎨 Pembatik: <span class="${pembatikBadgeClass}">${pembatikVal}</span></p>
+            <p style="font-size:0.85rem; margin:0 0 12px;">🤝 Bantuan: <span class="${bantuanBadgeClass}">${bantuanVal}</span></p>
+            <a href="${routeUrl}" target="_blank" rel="noopener noreferrer" style="
+                display:block; width:100%; text-align:center;
+                background:#069C67; color:#fff;
+                border-radius:0.5rem; padding:0.625rem;
+                font-size:0.85rem; font-weight:700;
+                text-decoration:none;
+                transition: background 0.2s;
+            " onmouseover="this.style.background='#057a52'" onmouseout="this.style.background='#069C67'">📍 Buka Rute di Gmaps</a>
+        </div>
+    `;
+}
 
-      let filtered = allLocations;
-
-      // Apply filter
-      if (filter === 'umkm') {
-        filtered = filtered.filter(l => l.isUmkm);
-      } else if (filter === 'warga') {
-        filtered = filtered.filter(l => !l.isUmkm);
-      }
-
-      // Apply search
-      if (searchQuery) {
-        const q = searchQuery.toLowerCase();
-        filtered = filtered.filter(l =>
-          (l.data.Nama_Lengkap || '').toLowerCase().includes(q) ||
-          (l.data.Jenis_UMKM || '').toLowerCase().includes(q) ||
-          (l.data.Pekerjaan || '').toLowerCase().includes(q) ||
-          ('rt ' + (l.data.RT || '')).toLowerCase().includes(q)
-        );
-      }
-
-      document.getElementById('sidebarCount').textContent = filtered.length;
-
-      if (filtered.length === 0) {
-        list.innerHTML = '<div class="px-4 py-12 text-center text-gray-400"><svg class="w-10 h-10 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg><p class="text-sm font-medium">Tidak ada data ditemukan</p></div>';
-        return;
-      }
-
-      filtered.forEach(loc => {
-        const isActive = loc.index === activeItemIndex;
-        const umkmLabel = loc.isUmkm
-          ? '<span class="inline-block px-2 py-0.5 rounded-full bg-brand-100 text-brand-700 text-[10px] font-semibold">' + loc.data.Jenis_UMKM + '</span>'
-          : '<span class="inline-block px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 text-[10px] font-semibold">Non-UMKM</span>';
-
-        const item = document.createElement('div');
-        item.className = 'loc-item' + (isActive ? ' active' : '');
-        item.setAttribute('data-index', loc.index);
-        item.innerHTML =
-          '<div class="flex items-start gap-3">'
-          + '<div class="mt-0.5 flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold" style="background:' + (loc.isUmkm ? '#059669' : '#6b7280') + '">'
-          + (loc.data.Nama_Lengkap ? loc.data.Nama_Lengkap.charAt(0).toUpperCase() : '?')
-          + '</div>'
-          + '<div class="min-w-0 flex-1">'
-          + '<p class="text-sm font-semibold text-gray-900 truncate">' + (loc.data.Nama_Lengkap || '-') + '</p>'
-          + '<p class="text-xs text-gray-500 mt-0.5">RT ' + (loc.data.RT || '-') + ' · ' + (loc.data.Pekerjaan || '-') + ' · ' + (loc.data.Usia || '-') + ' thn</p>'
-          + '<div class="mt-1">' + umkmLabel + '</div>'
-          + '</div>'
-          + '<svg class="w-4 h-4 text-gray-300 flex-shrink-0 mt-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>'
-          + '</div>';
-
-        item.addEventListener('click', () => flyToLocation(loc.index));
-        list.appendChild(item);
-      });
-    }
-
-    // Filter tabs
-    let currentFilter = 'all';
-    document.querySelectorAll('.filter-tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        currentFilter = tab.dataset.filter;
-        document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active-tab'));
-        tab.classList.add('active-tab');
-        renderSidebarList(currentFilter, document.getElementById('searchInput').value);
-      });
-    });
-
-    // Search
-    document.getElementById('searchInput').addEventListener('input', (e) => {
-      renderSidebarList(currentFilter, e.target.value);
-    });
-
-    // ============================================================
-    // LOAD DATA & RENDER MARKERS + LIST
-    // ============================================================
-    async function loadMarkers() {
-      try {
+// ─── Load Data ───
+async function loadData() {
+    try {
         const res = await fetch(GAS_URL);
         const json = await res.json();
-        if (!json.success) throw new Error(json.error);
-
-        const data = json.data;
-        let count = 0;
-
-        data.forEach((d, i) => {
-          const lat = parseFloat(d.Latitude);
-          const lng = parseFloat(d.Longitude);
-          if (isNaN(lat) || isNaN(lng) || lat === 0 || lng === 0) return;
-
-          const isUmkm = d.Jenis_UMKM && d.Jenis_UMKM !== '-';
-          const popupHtml = buildPopupHtml(d, isUmkm);
-
-          const marker = L.marker([lat, lng], { icon: createIcon(isUmkm) })
-            .addTo(map)
-            .bindPopup(popupHtml, { maxWidth: 260 });
-
-          // Store for sidebar interaction
-          allLocations.push({
-            index: count,
-            lat: lat,
-            lng: lng,
-            isUmkm: isUmkm,
-            data: d,
-            marker: marker
-          });
-
-          // When marker popup opens, highlight the corresponding sidebar item
-          marker.on('click', () => {
-            const idx = allLocations.findIndex(l => l.marker === marker);
-            if (idx >= 0) {
-              activeItemIndex = idx;
-              document.querySelectorAll('.loc-item').forEach(el => el.classList.remove('active'));
-              const el = document.querySelector('[data-index="' + idx + '"]');
-              if (el) {
-                el.classList.add('active');
-                el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-              }
-            }
-          });
-
-          count++;
+        allData = (json.data || json).filter(r => {
+            const lat = parseFloat(r.Latitude);
+            const lng = parseFloat(r.Longitude);
+            return !isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0;
         });
+        renderMarkers(allData);
+        renderLocationList(allData);
+        markerCountText.textContent = `${allData.length} Titik`;
+    } catch (err) {
+        console.error('Gagal memuat data:', err);
+        locationList.innerHTML = '<p class="text-center text-sm text-red-500 p-6">Gagal memuat data.</p>';
+    } finally {
+        loadingOverlay.classList.add('hidden');
+    }
+}
 
-        document.getElementById('markerNum').textContent = count;
-        document.getElementById('markerCount').classList.remove('hidden');
+// ─── Render Markers ───
+function renderMarkers(data) {
+    // Clear existing
+    Object.values(markers).forEach(m => map.removeLayer(m));
+    markers = {};
 
-        // Render sidebar list
-        renderSidebarList('all', '');
+    data.forEach((row, i) => {
+        const lat = parseFloat(row.Latitude);
+        const lng = parseFloat(row.Longitude);
+        const type = classifyPerson(row);
+        const icon = createMarkerIcon(getColor(type));
 
-        // Auto-fit bounds if there are markers
-        if (allLocations.length > 0) {
-          const group = L.featureGroup(allLocations.map(l => l.marker));
-          map.fitBounds(group.getBounds().pad(0.2));
-        }
+        const marker = L.marker([lat, lng], { icon })
+            .bindPopup(buildPopup(row), { maxWidth: 320 })
+            .addTo(map);
 
-      } catch (err) {
-        console.error('Map load error:', err);
-      } finally {
-        document.getElementById('mapLoading').style.display = 'none';
-      }
+        markers[i] = marker;
+        row._index = i;
+        row._type = type;
+    });
+}
+
+// ─── Render Location List ───
+function renderLocationList(data) {
+    if (data.length === 0) {
+        locationList.innerHTML = '<p class="text-center text-sm text-gray-400 p-8">Tidak ada data ditemukan.</p>';
+        return;
     }
 
-    loadMarkers();
-  </script>
-</body>
+    locationList.innerHTML = data.map((row, idx) => {
+        const type = row._type || classifyPerson(row);
+        const color = getColor(type);
+        const label = type === 'umkm' ? 'UMKM' : type === 'pembatik' ? 'Pembatik' : 'Warga';
+        return `
+            <div class="location-item" data-idx="${row._index}">
+                <span class="location-dot" style="background:${color};"></span>
+                <div style="min-width:0; flex:1;">
+                    <div class="location-item-name">${row.Nama_Lengkap || '-'}</div>
+                    <div class="location-item-detail">RT ${row.RT || '-'} · ${label}</div>
+                </div>
+            </div>
+        `;
+    }).join('');
 
+    // Click handlers
+    locationList.querySelectorAll('.location-item').forEach(el => {
+        el.addEventListener('click', () => {
+            const idx = parseInt(el.dataset.idx);
+            const marker = markers[idx];
+            if (marker) {
+                const latlng = marker.getLatLng();
+                map.flyTo(latlng, 17, { duration: 0.8 });
+                setTimeout(() => marker.openPopup(), 850);
+            }
+        });
+    });
+}
+
+// ─── Filter & Search ───
+function applyFilterAndSearch() {
+    const query = searchInput.value.toLowerCase().trim();
+
+    let filtered = allData.filter(row => {
+        // Filter
+        if (activeFilter === 'umkm' && row._type !== 'umkm') return false;
+        if (activeFilter === 'pembatik' && row._type !== 'pembatik') return false;
+        if (activeFilter === 'warga' && row._type !== 'regular') return false;
+
+        // Search
+        if (query) {
+            const name = (row.Nama_Lengkap || '').toLowerCase();
+            const rt = ('rt ' + (row.RT || '')).toLowerCase();
+            if (!name.includes(query) && !rt.includes(query)) return false;
+        }
+
+        return true;
+    });
+
+    renderMarkers(filtered);
+    renderLocationList(filtered);
+    markerCountText.textContent = `${filtered.length} Titik`;
+}
+
+// Filter tab clicks
+filterTabs.addEventListener('click', (e) => {
+    const tab = e.target.closest('.filter-tab');
+    if (!tab) return;
+    filterTabs.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    activeFilter = tab.dataset.filter;
+    applyFilterAndSearch();
+});
+
+// Search input
+searchInput.addEventListener('input', applyFilterAndSearch);
+
+// ─── Panel Toggle ───
+panelToggleBtn.addEventListener('click', () => {
+    rightPanel.classList.toggle('collapsed');
+    panelToggleBtn.classList.toggle('collapsed');
+    panelToggleBtn.textContent = rightPanel.classList.contains('collapsed') ? '❯' : '❮';
+    setTimeout(() => map.invalidateSize(), 350);
+});
+
+// ─── Mobile Sidebar ───
+hamburgerBtn.addEventListener('click', () => {
+    sidebar.classList.add('open');
+    mobileOverlay.classList.add('active');
+});
+
+mobileOverlay.addEventListener('click', () => {
+    sidebar.classList.remove('open');
+    mobileOverlay.classList.remove('active');
+});
+
+// ─── Init ───
+document.addEventListener('DOMContentLoaded', initMap);
+</script>
+
+</body>
 </html>

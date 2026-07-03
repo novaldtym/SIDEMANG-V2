@@ -1,353 +1,581 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SI-DEMANG KREBET — Input Data Penduduk</title>
-  <meta name="description"
-    content="Sistem Informasi Demografi dan Pemetaan UMKM Desa Krebet, Bantul. Form pendataan warga.">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <meta name="description" content="SI-DEMANG — Sistem Informasi Demografi & Pemetaan UMKM Desa Krebet, Pajangan, Bantul. Input data penduduk dan UMKM warga.">
+  <meta name="keywords" content="demografi, UMKM, Krebet, Pajangan, Bantul, KKN UPN, pendataan warga, pemetaan desa">
+  <meta name="author" content="KKN UPN Veteran Yogyakarta 2026">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="SI-DEMANG Krebet — Pendataan Warga">
+  <meta property="og:description" content="Sistem Informasi Demografi & Pemetaan UMKM Desa Krebet, Pajangan, Bantul">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#069C67">
+  <title>Input Data — SI-DEMANG Krebet</title>
+  <link rel="icon" href="assets/logo-krebetter.png" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
           fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
           colors: {
-            brand: { 50: '#ecfdf5', 100: '#d1fae5', 200: '#a7f3d0', 300: '#6ee7b7', 400: '#34d399', 500: '#10b981', 600: '#059669', 700: '#047857', 800: '#065f46', 900: '#064e3b', 950: '#022c22' }
+            primary: '#069C67',
+            'primary-dark': '#057a52',
+            accent: '#EFB3D1',
+            'accent-dark': '#e091b8'
           }
         }
       }
     }
   </script>
-  <style>
-    body {
-      font-family: 'Inter', system-ui, sans-serif;
-    }
-
-    .glass {
-      background: rgba(255, 255, 255, 0.7);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-    }
-
-    .input-focus:focus {
-      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
-    }
-
-    @keyframes fadeUp {
-      from {
-        opacity: 0;
-        transform: translateY(24px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .animate-fadeUp {
-      animation: fadeUp 0.5s ease-out both;
-    }
-
-    @keyframes spin-slow {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    .spinner {
-      animation: spin-slow 0.8s linear infinite;
-    }
-  </style>
 </head>
+<body class="bg-white font-sans text-gray-800 antialiased">
 
-<body class="min-h-screen bg-gradient-to-br from-brand-950 via-brand-900 to-emerald-800 text-gray-800">
+  <!-- ======================== SIDEBAR (Desktop) ======================== -->
+  <aside id="sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen bg-primary flex flex-col transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
+    <!-- Logo & Title -->
+    <div class="pt-8 pb-6 px-6">
+      <img src="assets/logo-sidemang.png" alt="Krebetter" class="w-20 h-20 mx-auto rounded-full bg-white p-1">
+      <h1 class="text-center text-white font-bold text-lg mt-2">SI-DEMANG</h1>
+      <p class="text-center text-green-200 text-xs">Krebet, Pajangan, Bantul</p>
+    </div>
 
-  <!-- NAVBAR -->
-  <nav class="sticky top-0 z-50 glass border-b border-white/20 shadow-lg">
-    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-      <a href="index.html" class="flex items-center gap-2">
-        <div class="w-9 h-9 rounded-lg bg-brand-600 flex items-center justify-center shadow">
-          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M12 21c-4.97 0-9-2.686-9-6V9c0-3.314 4.03-6 9-6s9 2.686 9 6v6c0 3.314-4.03 6-9 6z" />
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M12 11c2.21 0 4-1.343 4-3s-1.79-3-4-3-4 1.343-4 3 1.79 3 4 3z" />
-          </svg>
-        </div>
-        <span class="font-extrabold text-brand-900 text-lg tracking-tight">SI-DEMANG</span>
+    <!-- Navigation -->
+    <nav class="flex-1 px-4 space-y-1.5">
+      <a href="index.html" class="flex items-center gap-3 py-2.5 px-4 bg-white/20 rounded-lg font-semibold text-white transition-all">
+        <img src="assets/icon-input.png" class="w-5 h-5 brightness-0 invert" alt="">
+        <span class="text-sm">Input Data</span>
       </a>
-      <div class="hidden sm:flex items-center gap-1">
-        <a href="index.html" class="px-3 py-1.5 rounded-lg text-sm font-semibold bg-brand-600 text-white shadow">Input
-          Data</a>
-        <a href="dashboard.html"
-          class="px-3 py-1.5 rounded-lg text-sm font-medium text-brand-800 hover:bg-brand-100 transition">Dashboard</a>
-        <a href="map.html"
-          class="px-3 py-1.5 rounded-lg text-sm font-medium text-brand-800 hover:bg-brand-100 transition">Peta</a>
+      <a href="dashboard.html" class="flex items-center gap-3 py-2.5 px-4 rounded-lg text-green-100 hover:bg-white/10 hover:text-white transition-all">
+        <img src="assets/icon-dashboard.png" class="w-5 h-5 brightness-0 invert" alt="">
+        <span class="text-sm">Dashboard</span>
+      </a>
+      <a href="map.html" class="flex items-center gap-3 py-2.5 px-4 rounded-lg text-green-100 hover:bg-white/10 hover:text-white transition-all">
+        <img src="assets/icon-maps.png" class="w-5 h-5 brightness-0 invert" alt="">
+        <span class="text-sm">Peta Digital</span>
+      </a>
+    </nav>
+
+    <!-- Footer Logos -->
+    <div class="px-6 pb-6">
+      <div class="flex items-center justify-center gap-3 mb-2">
+        <img src="assets/logo-upn.png" class="w-10 h-10 object-contain" alt="UPN">
+        <img src="assets/logo-krebetter.png" class="w-10 h-10 object-contain rounded" alt="Krebetter">
+        <img src="assets/logo-krebet.jpg" class="w-10 h-10 object-contain rounded" alt="Krebet">
       </div>
-      <button id="mobileMenuBtn" class="sm:hidden p-2 rounded-lg hover:bg-brand-100 transition">
-        <svg class="w-6 h-6 text-brand-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+      <p class="text-xs text-green-200 text-center">&copy; 2026 KKN UPN Veteran Yogyakarta</p>
+    </div>
+  </aside>
+
+  <!-- ======================== SIDEBAR OVERLAY (Mobile) ======================== -->
+  <div id="sidebarOverlay" class="fixed inset-0 z-30 bg-black/50 backdrop-blur-sm hidden lg:hidden transition-opacity" onclick="closeSidebar()"></div>
+
+  <!-- ======================== MOBILE HEADER ======================== -->
+  <header class="fixed top-0 left-0 right-0 z-20 bg-primary shadow-lg lg:hidden">
+    <div class="flex items-center justify-between px-4 h-14">
+      <button onclick="openSidebar()" class="p-2 -ml-2 text-white rounded-lg hover:bg-white/10 transition-colors" aria-label="Menu">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
         </svg>
       </button>
+      <h1 class="text-white font-bold text-base tracking-wide">SI-DEMANG</h1>
+      <div class="w-10"></div>
     </div>
-    <div id="mobileMenu" class="hidden sm:hidden px-4 pb-3 space-y-1">
-      <a href="index.html" class="block px-3 py-2 rounded-lg text-sm font-semibold bg-brand-600 text-white">Input
-        Data</a>
-      <a href="dashboard.html"
-        class="block px-3 py-2 rounded-lg text-sm font-medium text-brand-800 hover:bg-brand-100">Dashboard</a>
-      <a href="map.html"
-        class="block px-3 py-2 rounded-lg text-sm font-medium text-brand-800 hover:bg-brand-100">Peta</a>
+  </header>
+
+  <!-- ======================== MAIN CONTENT ======================== -->
+  <main class="lg:ml-64 min-h-screen pb-24 lg:pb-8">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 lg:pt-10">
+
+      <!-- Page Header -->
+      <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">Pendataan Warga</h1>
+        <p class="text-sm text-gray-500 mt-1">Isi data warga Desa Krebet secara lengkap dan akurat untuk pendataan demografi &amp; UMKM.</p>
+      </div>
+
+      <!-- Form Card -->
+      <div class="bg-white rounded-2xl shadow-md p-6 sm:p-8 border border-gray-100">
+        <form id="formPendataan" novalidate>
+
+          <!-- ===== SECTION A — Data Pribadi ===== -->
+          <div class="mb-8">
+            <h2 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2">
+              <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-primary/10 text-primary text-sm font-extrabold">A</span>
+              Data Pribadi
+            </h2>
+            <p class="text-xs text-gray-400 mb-5 ml-9">Informasi identitas dasar warga</p>
+
+            <div class="space-y-5">
+              <!-- NIK -->
+              <div>
+                <label for="NIK" class="block text-sm font-semibold text-gray-700 mb-1.5">NIK <span class="text-red-500">*</span></label>
+                <input type="text" id="NIK" name="NIK" inputmode="numeric" pattern="\d{16}" maxlength="16" required placeholder="Masukkan 16 digit NIK" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm">
+                <p id="nikError" class="text-xs text-red-500 mt-1 hidden">NIK harus terdiri dari 16 digit angka.</p>
+              </div>
+
+              <!-- Nama Lengkap -->
+              <div>
+                <label for="Nama" class="block text-sm font-semibold text-gray-700 mb-1.5">Nama Lengkap <span class="text-red-500">*</span></label>
+                <input type="text" id="Nama" name="Nama" required placeholder="Nama sesuai KTP" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm">
+              </div>
+
+              <!-- Jenis Kelamin -->
+              <div>
+                <label for="Jenis_Kelamin" class="block text-sm font-semibold text-gray-700 mb-1.5">Jenis Kelamin <span class="text-red-500">*</span></label>
+                <select id="Jenis_Kelamin" name="Jenis_Kelamin" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm bg-white">
+                  <option value="" disabled selected>Pilih jenis kelamin</option>
+                  <option value="Laki-laki">Laki-laki</option>
+                  <option value="Perempuan">Perempuan</option>
+                </select>
+              </div>
+
+              <!-- RT (Radio Group) -->
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1.5">RT <span class="text-red-500">*</span></label>
+                <div class="flex gap-3">
+                  <label class="cursor-pointer">
+                    <input type="radio" name="RT" value="1" class="hidden peer" required>
+                    <span class="inline-flex items-center justify-center w-12 h-12 rounded-xl border-2 border-gray-300 text-gray-600 font-bold text-lg peer-checked:border-accent peer-checked:bg-accent/20 peer-checked:text-primary transition-all">1</span>
+                  </label>
+                  <label class="cursor-pointer">
+                    <input type="radio" name="RT" value="2" class="hidden peer">
+                    <span class="inline-flex items-center justify-center w-12 h-12 rounded-xl border-2 border-gray-300 text-gray-600 font-bold text-lg peer-checked:border-accent peer-checked:bg-accent/20 peer-checked:text-primary transition-all">2</span>
+                  </label>
+                  <label class="cursor-pointer">
+                    <input type="radio" name="RT" value="3" class="hidden peer">
+                    <span class="inline-flex items-center justify-center w-12 h-12 rounded-xl border-2 border-gray-300 text-gray-600 font-bold text-lg peer-checked:border-accent peer-checked:bg-accent/20 peer-checked:text-primary transition-all">3</span>
+                  </label>
+                  <label class="cursor-pointer">
+                    <input type="radio" name="RT" value="4" class="hidden peer">
+                    <span class="inline-flex items-center justify-center w-12 h-12 rounded-xl border-2 border-gray-300 text-gray-600 font-bold text-lg peer-checked:border-accent peer-checked:bg-accent/20 peer-checked:text-primary transition-all">4</span>
+                  </label>
+                  <label class="cursor-pointer">
+                    <input type="radio" name="RT" value="5" class="hidden peer">
+                    <span class="inline-flex items-center justify-center w-12 h-12 rounded-xl border-2 border-gray-300 text-gray-600 font-bold text-lg peer-checked:border-accent peer-checked:bg-accent/20 peer-checked:text-primary transition-all">5</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Usia -->
+              <div>
+                <label for="Usia" class="block text-sm font-semibold text-gray-700 mb-1.5">Usia <span class="text-red-500">*</span></label>
+                <input type="number" id="Usia" name="Usia" min="0" max="150" required placeholder="Contoh: 35" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm">
+              </div>
+
+              <!-- Pendidikan -->
+              <div>
+                <label for="Pendidikan" class="block text-sm font-semibold text-gray-700 mb-1.5">Pendidikan</label>
+                <select id="Pendidikan" name="Pendidikan" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm bg-white">
+                  <option value="" disabled selected>Pilih pendidikan terakhir</option>
+                  <option value="Tidak Sekolah">Tidak Sekolah</option>
+                  <option value="SD">SD</option>
+                  <option value="SMP">SMP</option>
+                  <option value="SMA/SMK">SMA/SMK</option>
+                  <option value="D1-D3">D1-D3</option>
+                  <option value="S1">S1</option>
+                  <option value="S2">S2</option>
+                  <option value="S3">S3</option>
+                </select>
+              </div>
+
+              <!-- Pekerjaan -->
+              <div>
+                <label for="Pekerjaan" class="block text-sm font-semibold text-gray-700 mb-1.5">Pekerjaan</label>
+                <select id="Pekerjaan" name="Pekerjaan" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm bg-white">
+                  <option value="" disabled selected>Pilih pekerjaan</option>
+                  <option value="Petani">Petani</option>
+                  <option value="Pedagang">Pedagang</option>
+                  <option value="PNS">PNS</option>
+                  <option value="Wiraswasta">Wiraswasta</option>
+                  <option value="Buruh">Buruh</option>
+                  <option value="Pengrajin Batik Kayu">Pengrajin Batik Kayu</option>
+                  <option value="Ibu Rumah Tangga">Ibu Rumah Tangga</option>
+                  <option value="Pelajar/Mahasiswa">Pelajar/Mahasiswa</option>
+                  <option value="Tidak Bekerja">Tidak Bekerja</option>
+                  <option value="Karyawan Swasta">Karyawan Swasta</option>
+                  <option value="Pensiunan">Pensiunan</option>
+                  <option value="Lainnya">Lainnya</option>
+                </select>
+                <!-- Dynamic Lainnya for Pekerjaan -->
+                <div id="pekerjaanLainnyaWrap" class="mt-3 overflow-hidden transition-all duration-300 max-h-0 opacity-0">
+                  <input type="text" id="pekerjaanLainnya" name="pekerjaanLainnya" placeholder="Tuliskan pekerjaan lainnya..." class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm">
+                </div>
+              </div>
+
+              <!-- Status Nikah -->
+              <div>
+                <label for="Status_Nikah" class="block text-sm font-semibold text-gray-700 mb-1.5">Status Pernikahan</label>
+                <select id="Status_Nikah" name="Status_Nikah" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm bg-white">
+                  <option value="" disabled selected>Pilih status pernikahan</option>
+                  <option value="Belum Menikah">Belum Menikah</option>
+                  <option value="Menikah">Menikah</option>
+                  <option value="Cerai Hidup">Cerai Hidup</option>
+                  <option value="Cerai Mati">Cerai Mati</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== SECTION B — UMKM & Pembatik ===== -->
+          <div class="mb-8">
+            <h2 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2">
+              <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-primary/10 text-primary text-sm font-extrabold">B</span>
+              UMKM &amp; Pembatik
+            </h2>
+            <p class="text-xs text-gray-400 mb-5 ml-9">Informasi usaha dan kegiatan batik warga</p>
+
+            <div class="space-y-5">
+              <!-- Jenis UMKM -->
+              <div>
+                <label for="Jenis_UMKM" class="block text-sm font-semibold text-gray-700 mb-1.5">Jenis UMKM</label>
+                <select id="Jenis_UMKM" name="Jenis_UMKM" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm bg-white">
+                  <option value="" disabled selected>Pilih jenis UMKM</option>
+                  <option value="Tidak Ada">Tidak Ada</option>
+                  <option value="Kerajinan Batik Kayu">Kerajinan Batik Kayu</option>
+                  <option value="Kuliner/Makanan">Kuliner/Makanan</option>
+                  <option value="Warung/Toko Kelontong">Warung/Toko Kelontong</option>
+                  <option value="Pertanian/Perkebunan">Pertanian/Perkebunan</option>
+                  <option value="Jasa">Jasa</option>
+                  <option value="Konveksi/Tekstil">Konveksi/Tekstil</option>
+                  <option value="Kerajinan Tangan">Kerajinan Tangan</option>
+                  <option value="Lainnya">Lainnya</option>
+                </select>
+                <!-- Dynamic Lainnya for UMKM -->
+                <div id="umkmLainnyaWrap" class="mt-3 overflow-hidden transition-all duration-300 max-h-0 opacity-0">
+                  <input type="text" id="umkmLainnya" name="umkmLainnya" placeholder="Tuliskan jenis UMKM lainnya..." class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm">
+                </div>
+              </div>
+
+              <!-- Keluarga Pembatik Toggle -->
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1.5">Keluarga Pembatik</label>
+                <div class="flex items-center gap-3">
+                  <button type="button" id="togglePembatik" onclick="togglePembatikSwitch()" class="relative w-14 h-7 rounded-full bg-gray-300 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary/30" role="switch" aria-checked="false">
+                    <span id="toggleKnob" class="absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow-md transition-transform duration-300"></span>
+                  </button>
+                  <span id="toggleLabel" class="text-sm text-gray-500">Tidak</span>
+                </div>
+                <input type="hidden" id="Keluarga_Pembatik" name="Keluarga_Pembatik" value="Tidak">
+              </div>
+
+              <!-- Jumlah Pembatik (Conditional) -->
+              <div id="jumlahPembatikWrap" class="overflow-hidden transition-all duration-300 max-h-0 opacity-0">
+                <label for="Jumlah_Pembatik" class="block text-sm font-semibold text-gray-700 mb-1.5">Jumlah Pembatik dalam Keluarga</label>
+                <input type="number" id="Jumlah_Pembatik" name="Jumlah_Pembatik" min="0" placeholder="Contoh: 2" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm">
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== SECTION C — Bantuan Sosial ===== -->
+          <div class="mb-8">
+            <h2 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2">
+              <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-primary/10 text-primary text-sm font-extrabold">C</span>
+              Bantuan Sosial
+            </h2>
+            <p class="text-xs text-gray-400 mb-5 ml-9">Data penerima bantuan sosial</p>
+
+            <div class="space-y-5">
+              <div>
+                <label for="Bantuan" class="block text-sm font-semibold text-gray-700 mb-1.5">Bantuan</label>
+                <select id="Bantuan" name="Bantuan" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm bg-white">
+                  <option value="" disabled selected>Pilih jenis bantuan</option>
+                  <option value="Tidak Ada">Tidak Ada</option>
+                  <option value="Bantuan JSLU">Bantuan JSLU</option>
+                  <option value="BLT">BLT</option>
+                  <option value="PKH">PKH</option>
+                  <option value="BPNT">BPNT</option>
+                  <option value="KIS/BPJS">KIS/BPJS</option>
+                  <option value="Bantuan Lainnya">Bantuan Lainnya</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== SECTION D — Koordinat Lokasi ===== -->
+          <div class="mb-8">
+            <h2 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2">
+              <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-primary/10 text-primary text-sm font-extrabold">D</span>
+              Koordinat Lokasi
+            </h2>
+            <p class="text-xs text-gray-400 mb-5 ml-9">Ambil titik koordinat rumah warga</p>
+
+            <div class="bg-green-50 border border-green-200 rounded-2xl p-5 space-y-4">
+              <button type="button" onclick="getLocation()" class="w-full flex items-center justify-center gap-2 py-3 bg-primary hover:bg-primary-dark text-white font-semibold text-sm rounded-xl shadow transition-all active:scale-[0.98]">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                Ambil Koordinat GPS
+              </button>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label for="Latitude" class="block text-sm font-semibold text-gray-700 mb-1.5">Latitude</label>
+                  <input type="text" id="Latitude" name="Latitude" readonly placeholder="—" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white/70 text-sm text-gray-600 outline-none">
+                </div>
+                <div>
+                  <label for="Longitude" class="block text-sm font-semibold text-gray-700 mb-1.5">Longitude</label>
+                  <input type="text" id="Longitude" name="Longitude" readonly placeholder="—" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white/70 text-sm text-gray-600 outline-none">
+                </div>
+              </div>
+
+              <p id="geoStatus" class="text-xs text-gray-500 text-center">Tekan tombol di atas untuk mengambil lokasi GPS.</p>
+            </div>
+          </div>
+
+          <!-- ===== SUBMIT ===== -->
+          <button type="submit" id="btnSubmit" class="w-full py-3.5 bg-primary hover:bg-primary-dark text-white font-bold text-base rounded-xl shadow-lg transition-all active:scale-[0.98]">
+            Kirim Data
+          </button>
+
+        </form>
+      </div>
+
+      <!-- Spacer -->
+      <div class="h-8"></div>
+    </div>
+  </main>
+
+  <!-- ======================== MOBILE BOTTOM NAV ======================== -->
+  <nav class="fixed bottom-0 left-0 right-0 z-20 bg-white border-t border-gray-200 lg:hidden">
+    <div class="flex items-center justify-around h-16">
+      <a href="index.html" class="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl bg-primary text-white transition-all">
+        <img src="assets/icon-input.png" class="w-5 h-5 brightness-0 invert" alt="">
+        <span class="text-[10px] font-semibold">Input</span>
+      </a>
+      <a href="dashboard.html" class="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-gray-500 hover:text-primary transition-all">
+        <img src="assets/icon-dashboard.png" class="w-5 h-5 opacity-60" alt="">
+        <span class="text-[10px] font-medium">Dashboard</span>
+      </a>
+      <a href="map.html" class="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-gray-500 hover:text-primary transition-all">
+        <img src="assets/icon-maps.png" class="w-5 h-5 opacity-60" alt="">
+        <span class="text-[10px] font-medium">Peta</span>
+      </a>
     </div>
   </nav>
 
-  <!-- HERO -->
-  <header class="max-w-3xl mx-auto px-4 pt-10 pb-6 text-center animate-fadeUp">
-    <h1 class="text-3xl sm:text-4xl font-extrabold text-white drop-shadow-lg">📋 Pendataan Warga</h1>
-    <p class="mt-2 text-brand-200 text-sm sm:text-base max-w-lg mx-auto">Isi formulir berikut untuk mendata penduduk dan
-      pelaku UMKM di Desa Krebet, Kecamatan Pajangan, Kabupaten Bantul.</p>
-  </header>
-
-  <!-- FORM CARD -->
-  <main class="max-w-2xl mx-auto px-4 pb-16 animate-fadeUp" style="animation-delay:0.15s">
-    <form id="dataForm" class="glass rounded-2xl shadow-2xl border border-white/30 p-6 sm:p-8 space-y-5">
-
-      <!-- NIK -->
-      <div>
-        <label for="nik" class="block text-sm font-semibold text-brand-900 mb-1">NIK <span
-            class="text-red-500">*</span></label>
-        <input type="text" id="nik" name="NIK" required maxlength="16" pattern="\d{16}" inputmode="numeric"
-          class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white/80 text-sm input-focus focus:outline-none focus:border-brand-500 transition"
-          placeholder="16 digit NIK">
-      </div>
-
-      <!-- Nama -->
-      <div>
-        <label for="nama" class="block text-sm font-semibold text-brand-900 mb-1">Nama Lengkap <span
-            class="text-red-500">*</span></label>
-        <input type="text" id="nama" name="Nama_Lengkap" required
-          class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white/80 text-sm input-focus focus:outline-none focus:border-brand-500 transition"
-          placeholder="Contoh: Budi Santoso">
-      </div>
-
-      <!-- RT & Usia (2-col) -->
-      <div class="grid grid-cols-2 gap-4">
-        <div>
-          <label for="rt" class="block text-sm font-semibold text-brand-900 mb-1">RT <span
-              class="text-red-500">*</span></label>
-          <input type="text" id="rt" name="RT" required
-            class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white/80 text-sm input-focus focus:outline-none focus:border-brand-500 transition"
-            placeholder="01">
-        </div>
-        <div>
-          <label for="usia" class="block text-sm font-semibold text-brand-900 mb-1">Usia <span
-              class="text-red-500">*</span></label>
-          <input type="number" id="usia" name="Usia" required min="0" max="150" inputmode="numeric"
-            class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white/80 text-sm input-focus focus:outline-none focus:border-brand-500 transition"
-            placeholder="35">
-        </div>
-      </div>
-
-      <!-- Pekerjaan -->
-      <div>
-        <label for="pekerjaan" class="block text-sm font-semibold text-brand-900 mb-1">Pekerjaan <span
-            class="text-red-500">*</span></label>
-        <select id="pekerjaan" name="Pekerjaan" required
-          class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white/80 text-sm input-focus focus:outline-none focus:border-brand-500 transition">
-          <option value="">— Pilih Pekerjaan —</option>
-          <option>Petani</option>
-          <option>Pedagang</option>
-          <option>PNS</option>
-          <option>Wiraswasta</option>
-          <option>Buruh</option>
-          <option>Pengrajin</option>
-          <option>Ibu Rumah Tangga</option>
-          <option>Pelajar/Mahasiswa</option>
-          <option>Tidak Bekerja</option>
-          <option>Lainnya</option>
-        </select>
-      </div>
-
-      <!-- Jenis UMKM -->
-      <div>
-        <label for="umkm" class="block text-sm font-semibold text-brand-900 mb-1">Jenis UMKM <span
-            class="text-gray-400 font-normal">(opsional)</span></label>
-        <select id="umkm" name="Jenis_UMKM"
-          class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white/80 text-sm input-focus focus:outline-none focus:border-brand-500 transition">
-          <option value="-">— Tidak Ada —</option>
-          <option>Kerajinan Batik Kayu</option>
-          <option>Kuliner / Makanan</option>
-          <option>Warung / Toko Kelontong</option>
-          <option>Pertanian / Perkebunan</option>
-          <option>Jasa</option>
-          <option>Konveksi / Tekstil</option>
-          <option>Kerajinan Tangan</option>
-          <option>Lainnya</option>
-        </select>
-      </div>
-
-      <!-- Koordinat -->
-      <div class="bg-brand-50 border border-brand-200 rounded-xl p-4 space-y-3">
-        <div class="flex items-center justify-between">
-          <span class="text-sm font-semibold text-brand-900">📍 Koordinat Lokasi</span>
-          <button type="button" id="geoBtn"
-            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold shadow transition active:scale-95">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M12 2a7 7 0 017 7c0 5.25-7 13-7 13S5 14.25 5 9a7 7 0 017-7z" />
-              <circle cx="12" cy="9" r="2.5" />
-            </svg>
-            Ambil Lokasi Saat Ini
-          </button>
-        </div>
-        <div id="geoStatus" class="text-xs text-brand-700 hidden"></div>
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label for="lat" class="block text-xs font-medium text-brand-800 mb-1">Latitude</label>
-            <input type="text" id="lat" name="Latitude" required readonly
-              class="w-full px-3 py-2 rounded-lg border border-brand-200 bg-white text-sm text-center font-mono"
-              placeholder="-7.xxxx">
-          </div>
-          <div>
-            <label for="lng" class="block text-xs font-medium text-brand-800 mb-1">Longitude</label>
-            <input type="text" id="lng" name="Longitude" required readonly
-              class="w-full px-3 py-2 rounded-lg border border-brand-200 bg-white text-sm text-center font-mono"
-              placeholder="110.xxxx">
-          </div>
-        </div>
-      </div>
-
-      <!-- Submit -->
-      <button type="submit" id="submitBtn"
-        class="w-full py-3 rounded-xl bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-700 hover:to-emerald-600 text-white font-bold text-base shadow-lg hover:shadow-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-        <span id="submitText">Kirim Data</span>
-        <svg id="submitSpinner" class="w-5 h-5 spinner hidden" fill="none" stroke="currentColor" stroke-width="2.5"
-          viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M4 12a8 8 0 018-8" />
-        </svg>
-      </button>
-    </form>
-
-    <!-- Alert -->
-    <div id="alertBox" class="hidden mt-4 p-4 rounded-xl text-sm font-medium shadow-lg transition-all"></div>
-  </main>
-
-  <!-- FOOTER -->
-  <footer class="text-center py-6 text-brand-300 text-xs">
-    &copy; 2026 KKN UPN "Veteran" Yogyakarta — Desa Krebet, Pajangan, Bantul
-  </footer>
-
+  <!-- ======================== JAVASCRIPT ======================== -->
   <script>
-    // ============================================================
-    // CONFIGURATION — Replace with your deployed GAS Web App URL
-    // ============================================================
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbwOiK7_-CV3SfPBt2fl6yYDiMMCV2LB6QXV2OQDQxMtki7FFWu61twVribaGJYWVwPT/exec';
 
-    // Mobile menu toggle
-    document.getElementById('mobileMenuBtn').addEventListener('click', () => {
-      document.getElementById('mobileMenu').classList.toggle('hidden');
+    // ---- Sidebar Toggle (Mobile) ----
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+    function openSidebar() {
+      sidebar.classList.remove('-translate-x-full');
+      sidebarOverlay.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeSidebar() {
+      sidebar.classList.add('-translate-x-full');
+      sidebarOverlay.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    // ---- Dynamic "Lainnya" for Pekerjaan ----
+    const pekerjaanSelect = document.getElementById('Pekerjaan');
+    const pekerjaanLainnyaWrap = document.getElementById('pekerjaanLainnyaWrap');
+
+    pekerjaanSelect.addEventListener('change', function () {
+      if (this.value === 'Lainnya') {
+        pekerjaanLainnyaWrap.style.maxHeight = '80px';
+        pekerjaanLainnyaWrap.style.opacity = '1';
+      } else {
+        pekerjaanLainnyaWrap.style.maxHeight = '0';
+        pekerjaanLainnyaWrap.style.opacity = '0';
+        document.getElementById('pekerjaanLainnya').value = '';
+      }
     });
 
-    // Geolocation
-    document.getElementById('geoBtn').addEventListener('click', () => {
+    // ---- Dynamic "Lainnya" for UMKM ----
+    const umkmSelect = document.getElementById('Jenis_UMKM');
+    const umkmLainnyaWrap = document.getElementById('umkmLainnyaWrap');
+
+    umkmSelect.addEventListener('change', function () {
+      if (this.value === 'Lainnya') {
+        umkmLainnyaWrap.style.maxHeight = '80px';
+        umkmLainnyaWrap.style.opacity = '1';
+      } else {
+        umkmLainnyaWrap.style.maxHeight = '0';
+        umkmLainnyaWrap.style.opacity = '0';
+        document.getElementById('umkmLainnya').value = '';
+      }
+    });
+
+    // ---- Pembatik Toggle Switch ----
+    let pembatikActive = false;
+
+    function togglePembatikSwitch() {
+      pembatikActive = !pembatikActive;
+      const btn = document.getElementById('togglePembatik');
+      const knob = document.getElementById('toggleKnob');
+      const label = document.getElementById('toggleLabel');
+      const hiddenInput = document.getElementById('Keluarga_Pembatik');
+      const jumlahWrap = document.getElementById('jumlahPembatikWrap');
+
+      if (pembatikActive) {
+        btn.classList.remove('bg-gray-300');
+        btn.classList.add('bg-primary');
+        btn.setAttribute('aria-checked', 'true');
+        knob.style.transform = 'translateX(1.75rem)';
+        label.textContent = 'Ya';
+        label.classList.remove('text-gray-500');
+        label.classList.add('text-primary', 'font-semibold');
+        hiddenInput.value = 'Ya';
+        jumlahWrap.style.maxHeight = '100px';
+        jumlahWrap.style.opacity = '1';
+      } else {
+        btn.classList.remove('bg-primary');
+        btn.classList.add('bg-gray-300');
+        btn.setAttribute('aria-checked', 'false');
+        knob.style.transform = 'translateX(0)';
+        label.textContent = 'Tidak';
+        label.classList.remove('text-primary', 'font-semibold');
+        label.classList.add('text-gray-500');
+        hiddenInput.value = 'Tidak';
+        jumlahWrap.style.maxHeight = '0';
+        jumlahWrap.style.opacity = '0';
+        document.getElementById('Jumlah_Pembatik').value = '';
+      }
+    }
+
+    // ---- Geolocation ----
+    function getLocation() {
       const status = document.getElementById('geoStatus');
-      status.classList.remove('hidden');
-      status.textContent = '⏳ Mengambil lokasi GPS...';
-      status.className = 'text-xs text-brand-700';
+      const latInput = document.getElementById('Latitude');
+      const lngInput = document.getElementById('Longitude');
 
       if (!navigator.geolocation) {
-        status.textContent = '❌ Browser tidak mendukung Geolocation.';
-        status.className = 'text-xs text-red-600';
+        status.textContent = '❌ Browser tidak mendukung geolokasi.';
+        status.classList.add('text-red-500');
         return;
       }
 
+      status.textContent = '📡 Mengambil lokasi...';
+      status.classList.remove('text-red-500', 'text-green-600');
+      status.classList.add('text-yellow-600');
+
       navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          document.getElementById('lat').value = pos.coords.latitude.toFixed(6);
-          document.getElementById('lng').value = pos.coords.longitude.toFixed(6);
-          status.textContent = '✅ Lokasi berhasil diambil! Akurasi: ±' + pos.coords.accuracy.toFixed(0) + ' meter';
-          status.className = 'text-xs text-green-700 font-medium';
+        function (pos) {
+          latInput.value = pos.coords.latitude.toFixed(7);
+          lngInput.value = pos.coords.longitude.toFixed(7);
+          status.textContent = '✅ Lokasi berhasil diambil!';
+          status.classList.remove('text-yellow-600');
+          status.classList.add('text-green-600');
         },
-        (err) => {
-          const msgs = { 1: 'Izin lokasi ditolak.', 2: 'Lokasi tidak tersedia.', 3: 'Waktu habis.' };
-          status.textContent = '❌ ' + (msgs[err.code] || err.message);
-          status.className = 'text-xs text-red-600';
+        function (err) {
+          status.textContent = '❌ Gagal mengambil lokasi: ' + err.message;
+          status.classList.remove('text-yellow-600');
+          status.classList.add('text-red-500');
         },
         { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
       );
+    }
+
+    // ---- NIK Validation (digits only) ----
+    const nikInput = document.getElementById('NIK');
+    const nikError = document.getElementById('nikError');
+
+    nikInput.addEventListener('input', function () {
+      this.value = this.value.replace(/\D/g, '').slice(0, 16);
+      if (this.value.length > 0 && this.value.length < 16) {
+        nikError.classList.remove('hidden');
+      } else {
+        nikError.classList.add('hidden');
+      }
     });
 
-    // Form submit
-    document.getElementById('dataForm').addEventListener('submit', async (e) => {
+    // ---- Form Submit ----
+    document.getElementById('formPendataan').addEventListener('submit', function (e) {
       e.preventDefault();
 
-      const btn = document.getElementById('submitBtn');
-      const text = document.getElementById('submitText');
-      const spin = document.getElementById('submitSpinner');
-      const alert = document.getElementById('alertBox');
-
-      // Validate GAS URL
-      if (!GAS_URL || GAS_URL.includes('YOUR_GAS_WEB_APP_URL_HERE')) {
-        showAlert('⚠️ GAS URL belum dikonfigurasi! Silakan ganti YOUR_GAS_WEB_APP_URL_HERE di kode.', 'warning');
+      // Validate NIK
+      const nik = nikInput.value.trim();
+      if (!/^\d{16}$/.test(nik)) {
+        nikError.classList.remove('hidden');
+        nikInput.focus();
         return;
       }
 
-      btn.disabled = true;
-      text.textContent = 'Mengirim...';
-      spin.classList.remove('hidden');
-
-      const payload = {
-        NIK: document.getElementById('nik').value.trim(),
-        Nama_Lengkap: document.getElementById('nama').value.trim(),
-        RT: document.getElementById('rt').value.trim(),
-        Usia: document.getElementById('usia').value,
-        Pekerjaan: document.getElementById('pekerjaan').value,
-        Jenis_UMKM: document.getElementById('umkm').value,
-        Latitude: document.getElementById('lat').value,
-        Longitude: document.getElementById('lng').value,
-      };
-
-      try {
-        const res = await fetch(GAS_URL, {
-          method: 'POST',
-          body: JSON.stringify(payload),
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        });
-        const json = await res.json();
-
-        if (json.success) {
-          showAlert('✅ ' + json.message, 'success');
-          document.getElementById('dataForm').reset();
-          document.getElementById('geoStatus').classList.add('hidden');
-        } else {
-          showAlert('❌ Gagal: ' + json.error, 'error');
-        }
-      } catch (err) {
-        showAlert('❌ Network error: ' + err.message, 'error');
-      } finally {
-        btn.disabled = false;
-        text.textContent = 'Kirim Data';
-        spin.classList.add('hidden');
+      // Get RT from radio
+      const rtRadio = document.querySelector('input[name="RT"]:checked');
+      if (!rtRadio) {
+        alert('Silakan pilih RT terlebih dahulu.');
+        return;
       }
-    });
 
-    function showAlert(msg, type) {
-      const el = document.getElementById('alertBox');
-      el.classList.remove('hidden');
-      el.textContent = msg;
-      const styles = {
-        success: 'bg-green-100 border border-green-300 text-green-800',
-        error: 'bg-red-100 border border-red-300 text-red-800',
-        warning: 'bg-yellow-100 border border-yellow-300 text-yellow-800',
+      // Determine Pekerjaan value
+      let pekerjaanVal = pekerjaanSelect.value;
+      if (pekerjaanVal === 'Lainnya') {
+        const lainnya = document.getElementById('pekerjaanLainnya').value.trim();
+        pekerjaanVal = lainnya || 'Lainnya';
+      }
+
+      // Determine UMKM value
+      let umkmVal = umkmSelect.value;
+      if (umkmVal === 'Lainnya') {
+        const lainnya = document.getElementById('umkmLainnya').value.trim();
+        umkmVal = lainnya || 'Lainnya';
+      }
+
+      // Build payload
+      const payload = {
+        NIK: nik,
+        Nama: document.getElementById('Nama').value.trim(),
+        Jenis_Kelamin: document.getElementById('Jenis_Kelamin').value,
+        RT: rtRadio.value,
+        Usia: document.getElementById('Usia').value,
+        Pendidikan: document.getElementById('Pendidikan').value,
+        Pekerjaan: pekerjaanVal,
+        Status_Nikah: document.getElementById('Status_Nikah').value,
+        Jenis_UMKM: umkmVal,
+        Keluarga_Pembatik: document.getElementById('Keluarga_Pembatik').value,
+        Jumlah_Pembatik: document.getElementById('Jumlah_Pembatik').value || '0',
+        Bantuan: document.getElementById('Bantuan').value,
+        Latitude: document.getElementById('Latitude').value,
+        Longitude: document.getElementById('Longitude').value
       };
-      el.className = 'mt-4 p-4 rounded-xl text-sm font-medium shadow-lg ' + (styles[type] || styles.warning);
-      setTimeout(() => el.classList.add('hidden'), 6000);
-    }
+
+      // Disable submit button
+      const btn = document.getElementById('btnSubmit');
+      const originalText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Mengirim...';
+      btn.classList.add('opacity-70', 'cursor-not-allowed');
+
+      // POST to GAS
+      fetch(GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify(payload)
+      })
+        .then(function (res) { return res.text(); })
+        .then(function (result) {
+          alert('✅ Data berhasil dikirim! Terima kasih.');
+          document.getElementById('formPendataan').reset();
+          // Reset dynamic fields
+          pekerjaanLainnyaWrap.style.maxHeight = '0';
+          pekerjaanLainnyaWrap.style.opacity = '0';
+          umkmLainnyaWrap.style.maxHeight = '0';
+          umkmLainnyaWrap.style.opacity = '0';
+          // Reset pembatik toggle
+          if (pembatikActive) togglePembatikSwitch();
+          // Reset geo
+          document.getElementById('Latitude').value = '';
+          document.getElementById('Longitude').value = '';
+          document.getElementById('geoStatus').textContent = 'Tekan tombol di atas untuk mengambil lokasi GPS.';
+          document.getElementById('geoStatus').className = 'text-xs text-gray-500 text-center';
+        })
+        .catch(function (err) {
+          alert('❌ Gagal mengirim data. Silakan coba lagi.\n' + err.message);
+        })
+        .finally(function () {
+          btn.disabled = false;
+          btn.textContent = originalText;
+          btn.classList.remove('opacity-70', 'cursor-not-allowed');
+        });
+    });
   </script>
 </body>
-
 </html>
