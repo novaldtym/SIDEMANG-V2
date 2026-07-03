@@ -75,17 +75,22 @@ function doPost(e) {
     if (!sheet) return buildJsonResponse({ success: false, error: 'Sheet not found' });
 
     const body = JSON.parse(e.postData.contents);
-    const required = ['NIK', 'Nama_Lengkap', 'Jenis_Kelamin', 'RT', 'Usia', 'Pekerjaan', 'Latitude', 'Longitude'];
-    for (const f of required) {
-      if (!body[f] && body[f] !== 0) return buildJsonResponse({ success: false, error: 'Field "' + f + '" wajib diisi.' });
-    }
 
-    const lat = parseFloat(String(body.Latitude).replace(',', '.'));
-    const lng = parseFloat(String(body.Longitude).replace(',', '.'));
+    // Accept both 'Nama' and 'Nama_Lengkap'
+    const namaLengkap = body.Nama_Lengkap || body.Nama || '';
+    // Accept both 'Pembatik' and 'Keluarga_Pembatik'
+    const pembatik = body.Pembatik || body.Keluarga_Pembatik || 'Tidak';
 
-    if (isNaN(lat) || isNaN(lng)) {
-      return buildJsonResponse({ success: false, error: 'Koordinat tidak valid.' });
-    }
+    // Validate required fields
+    if (!body.NIK) return buildJsonResponse({ success: false, error: 'Field "NIK" wajib diisi.' });
+    if (!namaLengkap) return buildJsonResponse({ success: false, error: 'Field "Nama" wajib diisi.' });
+    if (!body.Jenis_Kelamin) return buildJsonResponse({ success: false, error: 'Field "Jenis_Kelamin" wajib diisi.' });
+    if (!body.RT) return buildJsonResponse({ success: false, error: 'Field "RT" wajib diisi.' });
+    if (!body.Usia && body.Usia !== 0) return buildJsonResponse({ success: false, error: 'Field "Usia" wajib diisi.' });
+
+    // Parse coordinates (optional — default to 0 if empty)
+    const lat = parseFloat(String(body.Latitude || '0').replace(',', '.'));
+    const lng = parseFloat(String(body.Longitude || '0').replace(',', '.'));
 
     // Auto-uppercase Pekerjaan and Jenis_UMKM for database consistency
     const pekerjaan = String(body.Pekerjaan || '-').toUpperCase();
@@ -94,7 +99,7 @@ function doPost(e) {
     sheet.appendRow([
       new Date(),
       String(body.NIK),
-      body.Nama_Lengkap,
+      namaLengkap,
       body.Jenis_Kelamin || '-',
       String(body.RT),
       Number(body.Usia),
@@ -102,7 +107,7 @@ function doPost(e) {
       pekerjaan,
       body.Status_Nikah || '-',
       jenisUmkm,
-      body.Pembatik || 'Tidak',
+      pembatik,
       Number(body.Jumlah_Pembatik) || 0,
       body.Bantuan || 'Tidak Ada',
       lat,

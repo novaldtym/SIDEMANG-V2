@@ -355,7 +355,7 @@
 
   <!-- ======================== JAVASCRIPT ======================== -->
   <script>
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycbwOiK7_-CV3SfPBt2fl6yYDiMMCV2LB6QXV2OQDQxMtki7FFWu61twVribaGJYWVwPT/exec';
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbyLxbUHn3H81fZDcZi5o2zgdiIR8bdMwS2P13dACunGvjrF-aoVOsc_fKJWkCOW-oeP/exec';
 
     // ---- Sidebar Toggle (Mobile) ----
     const sidebar = document.getElementById('sidebar');
@@ -544,14 +544,15 @@
       btn.textContent = 'Mengirim...';
       btn.classList.add('opacity-70', 'cursor-not-allowed');
 
-      // POST to GAS
+      // POST to GAS (mode: no-cors is required for reliable GAS communication)
       fetch(GAS_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(payload)
       })
-        .then(function (res) { return res.text(); })
-        .then(function (result) {
+        .then(function () {
+          // With no-cors, response is opaque but data IS sent successfully
           alert('✅ Data berhasil dikirim! Terima kasih.');
           document.getElementById('formPendataan').reset();
           // Reset dynamic fields
@@ -568,7 +569,8 @@
           document.getElementById('geoStatus').className = 'text-xs text-gray-500 text-center';
         })
         .catch(function (err) {
-          alert('❌ Gagal mengirim data. Silakan coba lagi.\n' + err.message);
+          console.error('Fetch error:', err);
+          alert('❌ Gagal mengirim data. Periksa koneksi internet.\n' + err.message);
         })
         .finally(function () {
           btn.disabled = false;

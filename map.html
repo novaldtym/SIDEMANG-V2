@@ -346,50 +346,51 @@
 <!-- ═══════════════ LEFT SIDEBAR ═══════════════ -->
 <aside class="sidebar" id="sidebar">
     <!-- Top Logo -->
-    <div class="flex flex-col items-center pt-8 pb-6 px-4">
-        <img src="assets/logo-krebetter.png" class="w-20 h-20 mx-auto rounded-full bg-white p-1" alt="Logo Krebet">
-        <h1 class="text-xl font-extrabold tracking-tight mt-3">SI-DEMANG</h1>
-        <p class="text-xs text-white/70 mt-0.5">Desa Krebet, Jambon, Ponorogo</p>
+    <div class="pt-8 pb-6 px-6">
+        <img src="assets/logo-sidemang.png" alt="SI-DEMANG" class="w-20 h-20 mx-auto rounded-full bg-white p-1">
+        <h1 class="text-center text-white font-bold text-lg mt-2">SI-DEMANG</h1>
+        <p class="text-center text-green-200 text-xs" style="color:rgba(255,255,255,0.6)">Krebet, Pajangan, Bantul</p>
     </div>
 
     <!-- Navigation -->
-    <nav class="sidebar-nav flex flex-col gap-1 px-3 flex-1">
+    <nav class="sidebar-nav flex flex-col gap-1.5 px-4 flex-1">
         <a href="index.html">
-            <img src="assets/icon-dashboard.png" alt="Dashboard">
+            <img src="assets/icon-input.png" alt="Input" class="w-5 h-5 brightness-0 invert">
+            <span>Input Data</span>
+        </a>
+        <a href="dashboard.html">
+            <img src="assets/icon-dashboard.png" alt="Dashboard" class="w-5 h-5 brightness-0 invert">
             <span>Dashboard</span>
         </a>
-        <a href="demografi.html">
-            <img src="assets/icon-demografi.png" alt="Demografi">
-            <span>Demografi</span>
-        </a>
         <a href="map.html" class="active">
-            <img src="assets/icon-peta.png" alt="Peta">
+            <img src="assets/icon-maps.png" alt="Peta" class="w-5 h-5 brightness-0 invert">
             <span>Peta Digital</span>
         </a>
     </nav>
 
     <!-- Footer -->
-    <div class="px-4 pb-5 mt-auto">
-        <div class="flex items-center justify-center gap-3 mb-3">
-            <img src="assets/logo-upn.png" alt="UPN" class="w-8 h-8 rounded-full bg-white p-0.5">
-            <img src="assets/logo-krebet.png" alt="Krebet" class="w-8 h-8 rounded-full bg-white p-0.5">
+    <div class="px-6 pb-6">
+        <div class="flex items-center justify-center gap-3 mb-2">
+            <img src="assets/logo-upn.png" alt="UPN" class="w-10 h-10 object-contain">
+            <img src="assets/logo-krebetter.png" alt="Krebetter" class="w-10 h-10 object-contain rounded">
+            <img src="assets/logo-krebet.jpg" alt="Krebet" class="w-10 h-10 object-contain rounded">
         </div>
-        <p class="text-[0.65rem] text-white/50 text-center">&copy; 2026 KKN UPN Veteran Jatim</p>
+        <p class="text-xs text-center" style="color:rgba(255,255,255,0.5)">&copy; 2026 KKN UPN Veteran Yogyakarta</p>
     </div>
 </aside>
 
 <!-- ═══════════════ MOBILE BOTTOM NAV ═══════════════ -->
 <nav class="mobile-bottom-nav" id="mobileBottomNav">
     <a href="index.html">
+        <img src="assets/icon-input.png" alt="Input">
+        <span>Input</span>
+    </a>
+    <a href="dashboard.html">
         <img src="assets/icon-dashboard.png" alt="Dashboard">
         <span>Dashboard</span>
     </a>
-    <a href="demografi.html">
-        <img src="assets/icon-demografi.png" alt="Demografi">
-        <span>Demografi</span>
-    </a>
     <a href="map.html" class="active">
-        <img src="assets/icon-peta.png" alt="Peta">
+        <img src="assets/icon-maps.png" alt="Peta">
         <span>Peta</span>
     </a>
 </nav>
@@ -453,7 +454,7 @@
 
 <script>
 // ─── Constants ───
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwOiK7_-CV3SfPBt2fl6yYDiMMCV2LB6QXV2OQDQxMtki7FFWu61twVribaGJYWVwPT/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyLxbUHn3H81fZDcZi5o2zgdiIR8bdMwS2P13dACunGvjrF-aoVOsc_fKJWkCOW-oeP/exec';
 const KREBET_CENTER = [-7.8703, 110.3150];
 const ZOOM_DEFAULT = 15;
 
