@@ -511,15 +511,15 @@
 
     // ============ HELPERS ============
     function hasUMKM(d) {
-      const v = (d.Jenis_UMKM || '').trim().toLowerCase();
+      const v = String(d.Jenis_UMKM || '').trim().toLowerCase();
       return v && v !== '-' && v !== 'tidak ada' && v !== 'tidak' && v !== 'none';
     }
     function isPembatik(d) {
-      const v = (d.Pembatik || '').trim().toLowerCase();
+      const v = String(d.Pembatik || '').trim().toLowerCase();
       return v === 'ya' || v === 'iya';
     }
     function hasBantuan(d) {
-      const v = (d.Bantuan || '').trim().toLowerCase();
+      const v = String(d.Bantuan || '').trim().toLowerCase();
       return v && v !== 'tidak ada' && v !== '-' && v !== 'tidak' && v !== 'none';
     }
     function getAgeGroup(age) {
@@ -565,7 +565,7 @@
       // Pekerjaan
       const pekerjaanSet = new Set();
       data.forEach(d => {
-        const v = (d.Pekerjaan || '').trim();
+        const v = String(d.Pekerjaan || '').trim();
         if (v && v !== '-') pekerjaanSet.add(v);
       });
       const filterPekerjaan = document.getElementById('filterPekerjaan');
@@ -577,7 +577,7 @@
       // Bantuan
       const bantuanSet = new Set();
       data.forEach(d => {
-        const v = (d.Bantuan || '').trim();
+        const v = String(d.Bantuan || '').trim();
         if (v && v !== '-' && v.toLowerCase() !== 'tidak ada' && v.toLowerCase() !== 'tidak' && v.toLowerCase() !== 'none') {
           bantuanSet.add(v);
         }
@@ -615,17 +615,17 @@
         if (rtVal && String(d.RT) !== rtVal) return false;
 
         // JK filter
-        if (jkVal && (d.Jenis_Kelamin || '').trim() !== jkVal) return false;
+        if (jkVal && String(d.Jenis_Kelamin || '').trim() !== jkVal) return false;
 
         // Pekerjaan filter (contains)
         if (pekerjaanVal) {
-          const pek = (d.Pekerjaan || '').trim().toLowerCase();
+          const pek = String(d.Pekerjaan || '').trim().toLowerCase();
           if (!pek.includes(pekerjaanVal.toLowerCase())) return false;
         }
 
         // Bantuan filter
         if (bantuanVal) {
-          const ban = (d.Bantuan || '').trim();
+          const ban = String(d.Bantuan || '').trim();
           if (ban !== bantuanVal) return false;
         }
 
@@ -709,7 +709,7 @@
         // Member rows
         members.forEach((d, i) => {
           globalIdx++;
-          const umkmVal = (d.Jenis_UMKM || '').trim();
+          const umkmVal = String(d.Jenis_UMKM || '').trim();
           const umkmBadge = hasUMKM(d)
             ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">${umkmVal}</span>`
             : `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500">-</span>`;
@@ -718,7 +718,7 @@
             ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">Ya</span>`
             : `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500">Tidak</span>`;
 
-          const bantuanVal = (d.Bantuan || '').trim();
+          const bantuanVal = String(d.Bantuan || '').trim();
           const bantuanBadge = hasBantuan(d)
             ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">${bantuanVal}</span>`
             : `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500">Tidak Ada</span>`;
@@ -775,8 +775,8 @@
       const ages = data.map(d => parseInt(d.Usia)).filter(a => !isNaN(a));
       const avgAge = ages.length ? (ages.reduce((a, b) => a + b, 0) / ages.length).toFixed(1) : 0;
 
-      const bltCount = data.filter(d => (d.Bantuan || '').trim().toUpperCase() === 'BLT').length;
-      const pkhCount = data.filter(d => (d.Bantuan || '').trim().toUpperCase() === 'PKH').length;
+      const bltCount = data.filter(d => String(d.Bantuan || '').trim().toUpperCase() === 'BLT').length;
+      const pkhCount = data.filter(d => String(d.Bantuan || '').trim().toUpperCase() === 'PKH').length;
 
       document.getElementById('statTotal').textContent = total.toLocaleString('id-ID');
       document.getElementById('statKK').textContent = kkCount.toLocaleString('id-ID');
@@ -833,7 +833,7 @@
       // --- 2) Jenis UMKM (Horizontal Bar) ---
       const umkmMap = {};
       data.forEach(d => {
-        const v = (d.Jenis_UMKM || '').trim();
+        const v = String(d.Jenis_UMKM || '').trim();
         if (v && v !== '-' && v.toLowerCase() !== 'tidak ada' && v.toLowerCase() !== 'tidak' && v.toLowerCase() !== 'none') {
           umkmMap[v] = (umkmMap[v] || 0) + 1;
         }
@@ -865,7 +865,7 @@
       // --- 3) Distribusi Pekerjaan (Horizontal Bar) ---
       const pekerjaanMap = {};
       data.forEach(d => {
-        const v = (d.Pekerjaan || '').trim();
+        const v = String(d.Pekerjaan || '').trim();
         if (v && v !== '-') pekerjaanMap[v] = (pekerjaanMap[v] || 0) + 1;
       });
       const pekerjaanSorted = Object.entries(pekerjaanMap).sort((a, b) => b[1] - a[1]);
@@ -927,7 +927,7 @@
       // --- 5) Jenis Kelamin (Doughnut) ---
       const jkMap = {};
       data.forEach(d => {
-        const v = (d.Jenis_Kelamin || '').trim();
+        const v = String(d.Jenis_Kelamin || '').trim();
         if (v) jkMap[v] = (jkMap[v] || 0) + 1;
       });
       charts.jk = new Chart(document.getElementById('chartJK'), {
@@ -954,7 +954,7 @@
       // --- 6) Distribusi Bantuan (Bar) ---
       const bantuanMap = {};
       data.forEach(d => {
-        const v = (d.Bantuan || '').trim();
+        const v = String(d.Bantuan || '').trim();
         if (v && v !== '-') bantuanMap[v] = (bantuanMap[v] || 0) + 1;
       });
       const bantuanSorted = Object.entries(bantuanMap).sort((a, b) => b[1] - a[1]);
@@ -1014,10 +1014,10 @@
             d.Pendidikan || '-',
             d.Pekerjaan || '-',
             d.Status_Nikah || '-',
-            (d.Jenis_UMKM || '').trim() || '-',
-            (d.Pembatik || '').trim() || '-',
+            String(d.Jenis_UMKM || '').trim() || '-',
+            String(d.Pembatik || '').trim() || '-',
             d.Jumlah_Pembatik || '-',
-            (d.Bantuan || '').trim() || '-'
+            String(d.Bantuan || '').trim() || '-'
           ]);
         });
         // Empty separator
