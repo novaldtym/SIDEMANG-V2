@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script>
     tailwind.config = {
       theme: {
@@ -58,6 +59,12 @@
     .mobile-sidebar.active {
       transform: translateX(0);
     }
+    .kk-group-members { transition: max-height 0.3s ease, opacity 0.2s ease; overflow: hidden; }
+    .kk-group-members.collapsed { max-height: 0 !important; opacity: 0; }
+    .kk-header-toggle { cursor: pointer; user-select: none; }
+    .kk-header-toggle:hover { background-color: #dcfce7 !important; }
+    .kk-chevron { transition: transform 0.2s ease; display: inline-block; }
+    .kk-chevron.collapsed { transform: rotate(-90deg); }
   </style>
 </head>
 <body class="bg-white min-h-screen">
@@ -209,7 +216,7 @@
       <div id="dashboardContent" class="hidden space-y-6">
 
         <!-- ====== STAT CARDS ====== -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
           <!-- Total Warga -->
           <div class="bg-white rounded-2xl shadow-md p-5 border border-gray-100 fade-in-up">
             <div class="flex items-center gap-3">
@@ -223,8 +230,21 @@
             </div>
           </div>
 
-          <!-- Pelaku UMKM -->
+          <!-- Jumlah KK -->
           <div class="bg-white rounded-2xl shadow-md p-5 border border-gray-100 fade-in-up fade-in-up-delay-1">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-xl bg-yellow-100 flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Zm6-10.125a1.875 1.875 0 1 1-3.75 0 1.875 1.875 0 0 1 3.75 0Zm1.294 6.336a6.721 6.721 0 0 1-3.17.789 6.721 6.721 0 0 1-3.168-.789 3.376 3.376 0 0 1 6.338 0Z"/></svg>
+              </div>
+              <div class="min-w-0">
+                <p class="text-xs text-gray-500 truncate">Jumlah KK</p>
+                <p id="statKK" class="text-xl font-extrabold text-gray-900 mt-0.5">0</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pelaku UMKM -->
+          <div class="bg-white rounded-2xl shadow-md p-5 border border-gray-100 fade-in-up fade-in-up-delay-2">
             <div class="flex items-center gap-3">
               <div class="w-11 h-11 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
                 <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75 0 0 0-.75.75v3.75c0 .414.336.75.75.75Z"/></svg>
@@ -237,7 +257,7 @@
           </div>
 
           <!-- Keluarga Pembatik -->
-          <div class="bg-white rounded-2xl shadow-md p-5 border border-gray-100 fade-in-up fade-in-up-delay-2">
+          <div class="bg-white rounded-2xl shadow-md p-5 border border-gray-100 fade-in-up fade-in-up-delay-3">
             <div class="flex items-center gap-3">
               <div class="w-11 h-11 rounded-xl bg-purple-100 flex items-center justify-center flex-shrink-0">
                 <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.043-.025a15.994 15.994 0 0 1 1.622-3.395m3.42 3.42a15.995 15.995 0 0 0 4.764-4.648l3.876-5.814a1.151 1.151 0 0 0-1.597-1.597L14.146 6.32a15.996 15.996 0 0 0-4.649 4.763m3.42 3.42a6.776 6.776 0 0 0-3.42-3.42"/></svg>
@@ -250,7 +270,7 @@
           </div>
 
           <!-- Penerima Bantuan -->
-          <div class="bg-white rounded-2xl shadow-md p-5 border border-gray-100 fade-in-up fade-in-up-delay-3">
+          <div class="bg-white rounded-2xl shadow-md p-5 border border-gray-100 fade-in-up fade-in-up-delay-4">
             <div class="flex items-center gap-3">
               <div class="w-11 h-11 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
                 <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 11.25v8.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1 0 9.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1 1 14.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18C2.879 7.5 2.25 8.004 2.25 8.625v1.5c0 .621.504 1.125 1.125 1.125Z"/></svg>
@@ -368,10 +388,69 @@
 
         <!-- ====== DATA TABLE ====== -->
         <div class="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100">
-          <div class="px-5 py-4 border-b border-gray-100">
-            <h3 class="text-sm font-semibold text-gray-800">Data Terbaru</h3>
-            <p class="text-xs text-gray-400 mt-0.5">Menampilkan 20 entri terakhir</p>
+          <div class="px-5 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <h3 class="text-sm font-semibold text-gray-800">Data Penduduk per KK</h3>
+              <p class="text-xs text-gray-400 mt-0.5">Dikelompokkan berdasarkan Kartu Keluarga</p>
+            </div>
+            <button id="btnExport" onclick="exportExcel()" class="px-4 py-2 bg-primary text-white text-sm font-semibold rounded-lg hover:bg-primary-dark transition-all flex items-center gap-2 self-start sm:self-center">
+              📥 Export Excel
+            </button>
           </div>
+
+          <!-- Search & Filter Bar -->
+          <div class="bg-gray-50 rounded-xl p-4 mb-4 space-y-3 mx-4 mt-4">
+            <!-- Row 1: Search + Result count -->
+            <div class="flex flex-col sm:flex-row gap-3">
+              <input type="text" id="searchInput" placeholder="🔍 Cari nama, No KK, atau NIK..." class="flex-1 px-4 py-2.5 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none text-sm">
+              <span id="resultCount" class="text-sm text-gray-500 self-center whitespace-nowrap">Menampilkan 0 dari 0 data</span>
+            </div>
+
+            <!-- Row 2: Filter dropdowns -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+              <select id="filterRT" class="px-3 py-2 rounded-lg border border-gray-300 text-sm bg-white focus:border-primary outline-none">
+                <option value="">Semua RT</option>
+                <option value="1">RT 1</option>
+                <option value="2">RT 2</option>
+                <option value="3">RT 3</option>
+                <option value="4">RT 4</option>
+                <option value="5">RT 5</option>
+              </select>
+              <select id="filterJK" class="px-3 py-2 rounded-lg border border-gray-300 text-sm bg-white focus:border-primary outline-none">
+                <option value="">Semua JK</option>
+                <option value="Laki-laki">Laki-laki</option>
+                <option value="Perempuan">Perempuan</option>
+              </select>
+              <select id="filterPekerjaan" class="px-3 py-2 rounded-lg border border-gray-300 text-sm bg-white focus:border-primary outline-none">
+                <option value="">Semua Pekerjaan</option>
+              </select>
+              <select id="filterBantuan" class="px-3 py-2 rounded-lg border border-gray-300 text-sm bg-white focus:border-primary outline-none">
+                <option value="">Semua Bantuan</option>
+              </select>
+              <select id="filterUMKM" class="px-3 py-2 rounded-lg border border-gray-300 text-sm bg-white focus:border-primary outline-none">
+                <option value="">Semua UMKM</option>
+                <option value="ada">Ada UMKM</option>
+                <option value="tidak">Tidak Ada</option>
+              </select>
+              <select id="filterPembatik" class="px-3 py-2 rounded-lg border border-gray-300 text-sm bg-white focus:border-primary outline-none">
+                <option value="">Semua Pembatik</option>
+                <option value="ya">Ya</option>
+                <option value="tidak">Tidak</option>
+              </select>
+              <select id="filterUsia" class="px-3 py-2 rounded-lg border border-gray-300 text-sm bg-white focus:border-primary outline-none">
+                <option value="">Semua Usia</option>
+                <option value="0-14">Anak (0-14)</option>
+                <option value="15-24">Remaja (15-24)</option>
+                <option value="25-44">Dewasa (25-44)</option>
+                <option value="45-59">Paruh Baya (45-59)</option>
+                <option value="60+">Lansia (60+)</option>
+              </select>
+              <button id="btnReset" onclick="resetFilters()" class="px-3 py-2 rounded-lg bg-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-300">
+                ↻ Reset
+              </button>
+            </div>
+          </div>
+
           <div class="overflow-x-auto">
             <table class="w-full text-sm">
               <thead>
@@ -402,6 +481,10 @@
     // ============ CONSTANTS ============
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbyLxbUHn3H81fZDcZi5o2zgdiIR8bdMwS2P13dACunGvjrF-aoVOsc_fKJWkCOW-oeP/exec';
 
+    // ============ GLOBAL STATE ============
+    let allData = [];
+    let filteredData = [];
+
     // ============ MOBILE SIDEBAR ============
     const btnHamburger = document.getElementById('btnHamburger');
     const btnCloseSidebar = document.getElementById('btnCloseSidebar');
@@ -426,6 +509,29 @@
     // ============ CHART INSTANCES ============
     let charts = {};
 
+    // ============ HELPERS ============
+    function hasUMKM(d) {
+      const v = (d.Jenis_UMKM || '').trim().toLowerCase();
+      return v && v !== '-' && v !== 'tidak ada' && v !== 'tidak' && v !== 'none';
+    }
+    function isPembatik(d) {
+      const v = (d.Pembatik || '').trim().toLowerCase();
+      return v === 'ya' || v === 'iya';
+    }
+    function hasBantuan(d) {
+      const v = (d.Bantuan || '').trim().toLowerCase();
+      return v && v !== 'tidak ada' && v !== '-' && v !== 'tidak' && v !== 'none';
+    }
+    function getAgeGroup(age) {
+      const a = parseInt(age);
+      if (isNaN(a)) return null;
+      if (a <= 14) return '0-14';
+      if (a <= 24) return '15-24';
+      if (a <= 44) return '25-44';
+      if (a <= 59) return '45-59';
+      return '60+';
+    }
+
     // ============ LOAD DATA ============
     async function loadData() {
       const loadingEl = document.getElementById('loadingState');
@@ -441,13 +547,211 @@
         if (!res.ok) throw new Error('Network response was not ok');
         const json = await res.json();
         const data = json.data || json;
+        allData = Array.isArray(data) ? data : [];
         loadingEl.classList.add('hidden');
         dashboardEl.classList.remove('hidden');
-        renderDashboard(data);
+        populateFilterDropdowns(allData);
+        renderDashboard(allData);
+        applyFilters();
       } catch (err) {
         console.error('Fetch error:', err);
         loadingEl.classList.add('hidden');
         errorEl.classList.remove('hidden');
+      }
+    }
+
+    // ============ POPULATE FILTER DROPDOWNS ============
+    function populateFilterDropdowns(data) {
+      // Pekerjaan
+      const pekerjaanSet = new Set();
+      data.forEach(d => {
+        const v = (d.Pekerjaan || '').trim();
+        if (v && v !== '-') pekerjaanSet.add(v);
+      });
+      const filterPekerjaan = document.getElementById('filterPekerjaan');
+      filterPekerjaan.innerHTML = '<option value="">Semua Pekerjaan</option>';
+      [...pekerjaanSet].sort().forEach(p => {
+        filterPekerjaan.innerHTML += `<option value="${p}">${p}</option>`;
+      });
+
+      // Bantuan
+      const bantuanSet = new Set();
+      data.forEach(d => {
+        const v = (d.Bantuan || '').trim();
+        if (v && v !== '-' && v.toLowerCase() !== 'tidak ada' && v.toLowerCase() !== 'tidak' && v.toLowerCase() !== 'none') {
+          bantuanSet.add(v);
+        }
+      });
+      const filterBantuan = document.getElementById('filterBantuan');
+      filterBantuan.innerHTML = '<option value="">Semua Bantuan</option>';
+      [...bantuanSet].sort().forEach(b => {
+        filterBantuan.innerHTML += `<option value="${b}">${b}</option>`;
+      });
+    }
+
+    // ============ FILTER LOGIC ============
+    function applyFilters() {
+      const searchVal = document.getElementById('searchInput').value.trim().toLowerCase();
+      const rtVal = document.getElementById('filterRT').value;
+      const jkVal = document.getElementById('filterJK').value;
+      const pekerjaanVal = document.getElementById('filterPekerjaan').value;
+      const bantuanVal = document.getElementById('filterBantuan').value;
+      const umkmVal = document.getElementById('filterUMKM').value;
+      const pembatikVal = document.getElementById('filterPembatik').value;
+      const usiaVal = document.getElementById('filterUsia').value;
+
+      filteredData = allData.filter(d => {
+        // Text search: Nama_Lengkap, No_KK, NIK
+        if (searchVal) {
+          const nama = (d.Nama_Lengkap || '').toLowerCase();
+          const noKK = (d.No_KK || '').toString().toLowerCase();
+          const nik = (d.NIK || '').toString().toLowerCase();
+          if (!nama.includes(searchVal) && !noKK.includes(searchVal) && !nik.includes(searchVal)) {
+            return false;
+          }
+        }
+
+        // RT filter
+        if (rtVal && String(d.RT) !== rtVal) return false;
+
+        // JK filter
+        if (jkVal && (d.Jenis_Kelamin || '').trim() !== jkVal) return false;
+
+        // Pekerjaan filter (contains)
+        if (pekerjaanVal) {
+          const pek = (d.Pekerjaan || '').trim().toLowerCase();
+          if (!pek.includes(pekerjaanVal.toLowerCase())) return false;
+        }
+
+        // Bantuan filter
+        if (bantuanVal) {
+          const ban = (d.Bantuan || '').trim();
+          if (ban !== bantuanVal) return false;
+        }
+
+        // UMKM filter
+        if (umkmVal === 'ada' && !hasUMKM(d)) return false;
+        if (umkmVal === 'tidak' && hasUMKM(d)) return false;
+
+        // Pembatik filter
+        if (pembatikVal === 'ya' && !isPembatik(d)) return false;
+        if (pembatikVal === 'tidak' && isPembatik(d)) return false;
+
+        // Usia filter
+        if (usiaVal) {
+          const ag = getAgeGroup(d.Usia);
+          if (ag !== usiaVal) return false;
+        }
+
+        return true;
+      });
+
+      // Update result count
+      document.getElementById('resultCount').textContent = `Menampilkan ${filteredData.length} dari ${allData.length} data`;
+
+      // Re-render table
+      renderKKTable(filteredData);
+    }
+
+    function resetFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('filterRT').value = '';
+      document.getElementById('filterJK').value = '';
+      document.getElementById('filterPekerjaan').value = '';
+      document.getElementById('filterBantuan').value = '';
+      document.getElementById('filterUMKM').value = '';
+      document.getElementById('filterPembatik').value = '';
+      document.getElementById('filterUsia').value = '';
+      applyFilters();
+    }
+
+    // Attach filter event listeners
+    document.getElementById('searchInput').addEventListener('input', applyFilters);
+    document.getElementById('filterRT').addEventListener('change', applyFilters);
+    document.getElementById('filterJK').addEventListener('change', applyFilters);
+    document.getElementById('filterPekerjaan').addEventListener('change', applyFilters);
+    document.getElementById('filterBantuan').addEventListener('change', applyFilters);
+    document.getElementById('filterUMKM').addEventListener('change', applyFilters);
+    document.getElementById('filterPembatik').addEventListener('change', applyFilters);
+    document.getElementById('filterUsia').addEventListener('change', applyFilters);
+
+    // ============ GROUP BY KK ============
+    function groupByKK(data) {
+      const groups = new Map();
+      data.forEach(d => {
+        const kk = (d.No_KK || '').toString().trim() || 'Tanpa KK';
+        if (!groups.has(kk)) groups.set(kk, []);
+        groups.get(kk).push(d);
+      });
+      return groups;
+    }
+
+    // ============ RENDER KK TABLE ============
+    function renderKKTable(data) {
+      const tbody = document.getElementById('tableBody');
+      const groups = groupByKK(data);
+      let html = '';
+      let globalIdx = 0;
+
+      groups.forEach((members, kkNumber) => {
+        const groupId = 'kk-' + kkNumber.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '');
+
+        // KK Header row
+        html += `<tr class="kk-header-toggle bg-green-50" onclick="toggleKKGroup('${groupId}')">
+          <td colspan="9" class="px-4 py-3">
+            <div class="flex items-center gap-2">
+              <span class="kk-chevron" id="chevron-${groupId}">▼</span>
+              <span class="font-bold text-gray-800 text-sm">KK: ${kkNumber} — <span class="font-semibold text-gray-600">${members.length} anggota</span></span>
+            </div>
+          </td>
+        </tr>`;
+
+        // Member rows
+        members.forEach((d, i) => {
+          globalIdx++;
+          const umkmVal = (d.Jenis_UMKM || '').trim();
+          const umkmBadge = hasUMKM(d)
+            ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">${umkmVal}</span>`
+            : `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500">-</span>`;
+
+          const pembatikBadge = isPembatik(d)
+            ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">Ya</span>`
+            : `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500">Tidak</span>`;
+
+          const bantuanVal = (d.Bantuan || '').trim();
+          const bantuanBadge = hasBantuan(d)
+            ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">${bantuanVal}</span>`
+            : `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500">Tidak Ada</span>`;
+
+          html += `<tr class="hover:bg-gray-50 transition-colors kk-member-${groupId}">
+            <td class="px-4 py-3 text-xs text-gray-400 font-medium">${i + 1}</td>
+            <td class="px-4 py-3 text-sm font-medium text-gray-900 whitespace-nowrap">${d.Nama_Lengkap || '-'}</td>
+            <td class="px-4 py-3 text-sm text-gray-600">${d.Jenis_Kelamin || '-'}</td>
+            <td class="px-4 py-3 text-sm text-gray-600">${d.RT || '-'}</td>
+            <td class="px-4 py-3 text-sm text-gray-600">${d.Usia || '-'}</td>
+            <td class="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">${d.Pekerjaan || '-'}</td>
+            <td class="px-4 py-3">${umkmBadge}</td>
+            <td class="px-4 py-3">${pembatikBadge}</td>
+            <td class="px-4 py-3">${bantuanBadge}</td>
+          </tr>`;
+        });
+      });
+
+      tbody.innerHTML = html;
+    }
+
+    // ============ TOGGLE KK GROUP ============
+    function toggleKKGroup(groupId) {
+      const rows = document.querySelectorAll(`.kk-member-${groupId}`);
+      const chevron = document.getElementById(`chevron-${groupId}`);
+      const isCurrentlyVisible = rows.length > 0 && rows[0].style.display !== 'none';
+
+      rows.forEach(row => {
+        row.style.display = isCurrentlyVisible ? 'none' : '';
+      });
+
+      if (chevron) {
+        chevron.classList.toggle('collapsed', isCurrentlyVisible);
       }
     }
 
@@ -458,20 +762,12 @@
       // --- Stats ---
       const total = data.length;
 
-      const umkmCount = data.filter(d => {
-        const v = (d.Jenis_UMKM || '').trim().toLowerCase();
-        return v && v !== '-' && v !== 'tidak ada' && v !== 'tidak' && v !== 'none';
-      }).length;
+      const kkSet = new Set(data.map(d => (d.No_KK || '').toString().trim()).filter(Boolean));
+      const kkCount = kkSet.size;
 
-      const pembatikCount = data.filter(d => {
-        const v = (d.Pembatik || '').trim().toLowerCase();
-        return v === 'ya' || v === 'iya';
-      }).length;
-
-      const bantuanCount = data.filter(d => {
-        const v = (d.Bantuan || '').trim().toLowerCase();
-        return v && v !== 'tidak ada' && v !== '-' && v !== 'tidak' && v !== 'none';
-      }).length;
+      const umkmCount = data.filter(d => hasUMKM(d)).length;
+      const pembatikCount = data.filter(d => isPembatik(d)).length;
+      const bantuanCount = data.filter(d => hasBantuan(d)).length;
 
       const rtSet = new Set(data.map(d => d.RT).filter(Boolean));
       const rtCount = rtSet.size;
@@ -483,6 +779,7 @@
       const pkhCount = data.filter(d => (d.Bantuan || '').trim().toUpperCase() === 'PKH').length;
 
       document.getElementById('statTotal').textContent = total.toLocaleString('id-ID');
+      document.getElementById('statKK').textContent = kkCount.toLocaleString('id-ID');
       document.getElementById('statUMKM').textContent = umkmCount.toLocaleString('id-ID');
       document.getElementById('statPembatik').textContent = pembatikCount.toLocaleString('id-ID');
       document.getElementById('statBantuan').textContent = bantuanCount.toLocaleString('id-ID');
@@ -683,44 +980,96 @@
           }
         }
       });
+    }
 
-      // --- DATA TABLE ---
-      const tbody = document.getElementById('tableBody');
-      const last20 = data.slice(-20).reverse();
-      tbody.innerHTML = last20.map((d, i) => {
-        const umkmVal = (d.Jenis_UMKM || '').trim();
-        const hasUMKM = umkmVal && umkmVal !== '-' && umkmVal.toLowerCase() !== 'tidak ada' && umkmVal.toLowerCase() !== 'tidak' && umkmVal.toLowerCase() !== 'none';
+    // ============ EXPORT EXCEL ============
+    function exportExcel() {
+      if (!filteredData || filteredData.length === 0) {
+        alert('Tidak ada data untuk di-export.');
+        return;
+      }
 
-        const pembatikVal = (d.Pembatik || '').trim().toLowerCase();
-        const isPembatik = pembatikVal === 'ya' || pembatikVal === 'iya';
+      const wb = XLSX.utils.book_new();
+      const wsData = [];
 
-        const bantuanVal = (d.Bantuan || '').trim();
-        const hasBantuan = bantuanVal && bantuanVal !== '-' && bantuanVal.toLowerCase() !== 'tidak ada' && bantuanVal.toLowerCase() !== 'tidak' && bantuanVal.toLowerCase() !== 'none';
+      // Title row
+      wsData.push(['Data Penduduk Dusun Krebet']);
+      wsData.push([]); // empty separator
 
-        const umkmBadge = hasUMKM
-          ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">${umkmVal}</span>`
-          : `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500">-</span>`;
+      const groups = groupByKK(filteredData);
 
-        const pembatikBadge = isPembatik
-          ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">Ya</span>`
-          : `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500">Tidak</span>`;
+      groups.forEach((members, kkNumber) => {
+        // KK header row
+        wsData.push([`KK: ${kkNumber}`]);
+        // Column headers
+        wsData.push(['No', 'Nama', 'JK', 'RT', 'Usia', 'Pendidikan', 'Pekerjaan', 'Status Nikah', 'UMKM', 'Pembatik', 'Jml Pembatik', 'Bantuan']);
+        // Data rows
+        members.forEach((d, i) => {
+          wsData.push([
+            i + 1,
+            d.Nama_Lengkap || '-',
+            d.Jenis_Kelamin || '-',
+            d.RT || '-',
+            d.Usia || '-',
+            d.Pendidikan || '-',
+            d.Pekerjaan || '-',
+            d.Status_Nikah || '-',
+            (d.Jenis_UMKM || '').trim() || '-',
+            (d.Pembatik || '').trim() || '-',
+            d.Jumlah_Pembatik || '-',
+            (d.Bantuan || '').trim() || '-'
+          ]);
+        });
+        // Empty separator
+        wsData.push([]);
+      });
 
-        const bantuanBadge = hasBantuan
-          ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">${bantuanVal}</span>`
-          : `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500">Tidak Ada</span>`;
+      const ws = XLSX.utils.aoa_to_sheet(wsData);
 
-        return `<tr class="hover:bg-gray-50 transition-colors">
-          <td class="px-4 py-3 text-xs text-gray-400 font-medium">${i + 1}</td>
-          <td class="px-4 py-3 text-sm font-medium text-gray-900 whitespace-nowrap">${d.Nama_Lengkap || '-'}</td>
-          <td class="px-4 py-3 text-sm text-gray-600">${d.Jenis_Kelamin || '-'}</td>
-          <td class="px-4 py-3 text-sm text-gray-600">${d.RT || '-'}</td>
-          <td class="px-4 py-3 text-sm text-gray-600">${d.Usia || '-'}</td>
-          <td class="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">${d.Pekerjaan || '-'}</td>
-          <td class="px-4 py-3">${umkmBadge}</td>
-          <td class="px-4 py-3">${pembatikBadge}</td>
-          <td class="px-4 py-3">${bantuanBadge}</td>
-        </tr>`;
-      }).join('');
+      // Merge title row across 12 columns
+      ws['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 11 } }];
+
+      // Bold title
+      if (ws['A1']) {
+        ws['A1'].s = { font: { bold: true, sz: 14 } };
+      }
+
+      // Style KK header rows and column header rows
+      let rowIdx = 0;
+      wsData.forEach((row, idx) => {
+        if (row.length === 1 && typeof row[0] === 'string' && row[0].startsWith('KK:')) {
+          // Bold + green bg for KK header
+          const cellRef = XLSX.utils.encode_cell({ r: idx, c: 0 });
+          if (ws[cellRef]) {
+            ws[cellRef].s = { font: { bold: true }, fill: { fgColor: { rgb: 'DCFCE7' } } };
+          }
+          // Merge KK header across 12 columns
+          if (!ws['!merges']) ws['!merges'] = [];
+          ws['!merges'].push({ s: { r: idx, c: 0 }, e: { r: idx, c: 11 } });
+        }
+        if (row.length > 1 && row[0] === 'No' && row[1] === 'Nama') {
+          // Bold column headers
+          for (let c = 0; c < row.length; c++) {
+            const cellRef = XLSX.utils.encode_cell({ r: idx, c: c });
+            if (ws[cellRef]) {
+              ws[cellRef].s = { font: { bold: true } };
+            }
+          }
+        }
+      });
+
+      // Auto-width columns
+      const colWidths = [];
+      wsData.forEach(row => {
+        row.forEach((cell, ci) => {
+          const len = String(cell || '').length;
+          colWidths[ci] = Math.max(colWidths[ci] || 8, len + 2);
+        });
+      });
+      ws['!cols'] = colWidths.map(w => ({ wch: Math.min(w, 40) }));
+
+      XLSX.utils.book_append_sheet(wb, ws, 'Data Warga');
+      XLSX.writeFile(wb, 'Data_Warga_Krebet.xlsx');
     }
 
     // ============ INIT ============

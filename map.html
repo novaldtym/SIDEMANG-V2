@@ -318,10 +318,56 @@
                 margin-top: 56px;
             }
 
-            .right-panel { width: 100%; position: absolute; right: 0; top: 0; bottom: 0; }
-            .right-panel.collapsed { width: 0; }
-            .panel-toggle-btn { right: 0; }
-            .panel-toggle-btn:not(.collapsed) { right: 100%; }
+            /* ── Bottom Sheet ── */
+            .right-panel {
+                position: fixed !important;
+                bottom: 60px;
+                left: 0;
+                right: 0;
+                top: auto !important;
+                height: 45vh;
+                max-height: 45vh;
+                width: 100% !important;
+                border-left: none !important;
+                border-radius: 16px 16px 0 0;
+                box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+                transition: transform 0.3s ease;
+                z-index: 800;
+                transform: translateY(calc(100% + 60px));
+            }
+            .right-panel.sheet-visible {
+                transform: translateY(0);
+            }
+            .right-panel.collapsed {
+                width: 100% !important;
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+            /* ── Sheet Handle ── */
+            .sheet-handle { display: block !important; }
+
+            /* ── Sheet Close Button ── */
+            .sheet-close-btn { display: flex !important; }
+
+            /* ── FAB Toggle Button ── */
+            .panel-toggle-btn {
+                position: fixed !important;
+                bottom: 72px;
+                right: 12px;
+                top: auto !important;
+                left: auto !important;
+                transform: none !important;
+                z-index: 700;
+                width: 44px;
+                height: 44px;
+                border-radius: 50% !important;
+                font-size: 1.15rem;
+            }
+            .panel-toggle-btn.collapsed {
+                right: 12px;
+                border-radius: 50% !important;
+            }
 
             .marker-count-badge { top: 10px; left: 10px; font-size: 0.78rem; padding: 0.4rem 0.8rem; }
             .map-legend { bottom: 16px; left: 10px; }
@@ -429,8 +475,14 @@
 
     <!-- Right Data Panel -->
     <div class="right-panel" id="rightPanel">
-        <div class="right-panel-header">
+        <!-- Sheet Handle (mobile only) -->
+        <div class="sheet-handle" style="display:none;">
+            <div style="width:40px;height:4px;background:#d1d5db;border-radius:9999px;margin:8px auto 4px;"></div>
+        </div>
+        <div class="right-panel-header" style="position:relative;">
             <h2 class="font-bold text-sm text-gray-800 mb-2">📍 Daftar Lokasi</h2>
+            <!-- Close button (mobile only) -->
+            <button class="sheet-close-btn" id="sheetCloseBtn" style="display:none; position:absolute; top:12px; right:12px; width:30px; height:30px; border-radius:50%; border:none; background:#f3f4f6; color:#374151; font-size:1rem; cursor:pointer; align-items:center; justify-content:center; transition:background 0.2s;" title="Tutup">&times;</button>
             <input type="text" class="search-box" id="searchInput" placeholder="Cari nama atau RT...">
         </div>
         <div class="filter-tabs" id="filterTabs">
@@ -652,6 +704,10 @@ function renderLocationList(data) {
             const idx = parseInt(el.dataset.idx);
             const marker = markers[idx];
             if (marker) {
+                // On mobile, close bottom sheet first
+                if (isMobile()) {
+                    hideSheet();
+                }
                 const latlng = marker.getLatLng();
                 map.flyTo(latlng, 17, { duration: 0.8 });
                 setTimeout(() => marker.openPopup(), 850);
@@ -698,13 +754,46 @@ filterTabs.addEventListener('click', (e) => {
 // Search input
 searchInput.addEventListener('input', applyFilterAndSearch);
 
+// ─── Helpers ───
+function isMobile() {
+    return window.innerWidth <= 768;
+}
+
+function showSheet() {
+    rightPanel.classList.add('sheet-visible');
+    panelToggleBtn.textContent = '❮';
+}
+
+function hideSheet() {
+    rightPanel.classList.remove('sheet-visible');
+    panelToggleBtn.textContent = '📋';
+}
+
 // ─── Panel Toggle ───
 panelToggleBtn.addEventListener('click', () => {
-    rightPanel.classList.toggle('collapsed');
-    panelToggleBtn.classList.toggle('collapsed');
-    panelToggleBtn.textContent = rightPanel.classList.contains('collapsed') ? '❯' : '❮';
-    setTimeout(() => map.invalidateSize(), 350);
+    if (isMobile()) {
+        // Mobile: toggle bottom sheet
+        if (rightPanel.classList.contains('sheet-visible')) {
+            hideSheet();
+        } else {
+            showSheet();
+        }
+    } else {
+        // Desktop: original sidebar toggle
+        rightPanel.classList.toggle('collapsed');
+        panelToggleBtn.classList.toggle('collapsed');
+        panelToggleBtn.textContent = rightPanel.classList.contains('collapsed') ? '❯' : '❮';
+        setTimeout(() => map.invalidateSize(), 350);
+    }
 });
+
+// ─── Sheet Close Button ───
+const sheetCloseBtn = document.getElementById('sheetCloseBtn');
+if (sheetCloseBtn) {
+    sheetCloseBtn.addEventListener('click', () => {
+        hideSheet();
+    });
+}
 
 // ─── Mobile Sidebar ───
 hamburgerBtn.addEventListener('click', () => {
@@ -718,7 +807,15 @@ mobileOverlay.addEventListener('click', () => {
 });
 
 // ─── Init ───
-document.addEventListener('DOMContentLoaded', initMap);
+document.addEventListener('DOMContentLoaded', () => {
+    initMap();
+    // On mobile, start with sheet hidden and FAB showing clipboard icon
+    if (isMobile()) {
+        rightPanel.classList.remove('collapsed');
+        panelToggleBtn.classList.remove('collapsed');
+        panelToggleBtn.textContent = '📋';
+    }
+});
 </script>
 
 </body>

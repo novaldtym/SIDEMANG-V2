@@ -6,6 +6,7 @@
 const SHEET_NAME = 'Data';
 const COLUMNS = [
   'Timestamp',
+  'No_KK',
   'NIK',
   'Nama_Lengkap',
   'Jenis_Kelamin',
@@ -32,6 +33,7 @@ function doGet(e) {
 
     const data = sheet.getDataRange().getValues();
 
+    // Detect header row
     let startIndex = 0;
     const firstCell = String(data[0][0]).trim().toLowerCase();
     if (firstCell === 'timestamp') {
@@ -39,7 +41,16 @@ function doGet(e) {
     }
 
     const rows = data.slice(startIndex);
-    const result = rows.map(row => {
+    const result = [];
+
+    for (let r = 0; r < rows.length; r++) {
+      const row = rows[r];
+
+      // Skip empty rows (no NIK or Nama)
+      const nikVal = String(row[2] || '').trim();
+      const namaVal = String(row[3] || '').trim();
+      if (!nikVal && !namaVal) continue;
+
       const obj = {};
       COLUMNS.forEach((col, i) => {
         let val = row[i];
@@ -60,8 +71,8 @@ function doGet(e) {
         }
         obj[col] = val;
       });
-      return obj;
-    });
+      result.push(obj);
+    }
 
     return buildJsonResponse({ success: true, data: result, count: result.length });
   } catch (error) {
@@ -76,28 +87,30 @@ function doPost(e) {
 
     const body = JSON.parse(e.postData.contents);
 
-    // Accept both 'Nama' and 'Nama_Lengkap'
+    // Accept flexible field names
     const namaLengkap = body.Nama_Lengkap || body.Nama || '';
-    // Accept both 'Pembatik' and 'Keluarga_Pembatik'
     const pembatik = body.Pembatik || body.Keluarga_Pembatik || 'Tidak';
+    const noKK = String(body.No_KK || '').trim();
 
     // Validate required fields
+    if (!noKK) return buildJsonResponse({ success: false, error: 'Field "No_KK" wajib diisi.' });
     if (!body.NIK) return buildJsonResponse({ success: false, error: 'Field "NIK" wajib diisi.' });
     if (!namaLengkap) return buildJsonResponse({ success: false, error: 'Field "Nama" wajib diisi.' });
     if (!body.Jenis_Kelamin) return buildJsonResponse({ success: false, error: 'Field "Jenis_Kelamin" wajib diisi.' });
     if (!body.RT) return buildJsonResponse({ success: false, error: 'Field "RT" wajib diisi.' });
     if (!body.Usia && body.Usia !== 0) return buildJsonResponse({ success: false, error: 'Field "Usia" wajib diisi.' });
 
-    // Parse coordinates (optional — default to 0 if empty)
+    // Parse coordinates (optional)
     const lat = parseFloat(String(body.Latitude || '0').replace(',', '.'));
     const lng = parseFloat(String(body.Longitude || '0').replace(',', '.'));
 
-    // Auto-uppercase Pekerjaan and Jenis_UMKM for database consistency
+    // Auto-uppercase for consistency
     const pekerjaan = String(body.Pekerjaan || '-').toUpperCase();
     const jenisUmkm = String(body.Jenis_UMKM || '-').toUpperCase();
 
     sheet.appendRow([
       new Date(),
+      noKK,
       String(body.NIK),
       namaLengkap,
       body.Jenis_Kelamin || '-',
@@ -114,6 +127,12 @@ function doPost(e) {
       lng
     ]);
 
+    // Auto-sort by No_KK (column 2) to group families together
+    const lastRow = sheet.getLastRow();
+    if (lastRow > 2) {
+      sheet.getRange(2, 1, lastRow - 1, COLUMNS.length).sort(2);
+    }
+
     return buildJsonResponse({ success: true, message: 'Data berhasil disimpan!' });
   } catch (error) {
     return buildJsonResponse({ success: false, error: error.message });
@@ -129,15 +148,10 @@ function initializeSheet() {
   let sheet = ss.getSheetByName(SHEET_NAME);
   if (!sheet) sheet = ss.insertSheet(SHEET_NAME);
 
-  const lastRow = sheet.getLastRow();
-  if (lastRow > 0) {
-    const firstCell = String(sheet.getRange(1, 1).getValue()).trim().toLowerCase();
-    if (firstCell !== 'timestamp') {
-      sheet.insertRowBefore(1);
-    }
-  }
+  // Clear existing data (user confirmed dummy data can be overwritten)
+  sheet.clearContents();
 
   sheet.getRange(1, 1, 1, COLUMNS.length).setValues([COLUMNS]).setFontWeight('bold').setBackground('#069C67').setFontColor('#fff');
   COLUMNS.forEach((_, i) => sheet.autoResizeColumn(i + 1));
-  SpreadsheetApp.getUi().alert('Sheet "Data" berhasil diinisialisasi dengan ' + COLUMNS.length + ' kolom!');
+  SpreadsheetApp.getUi().alert('Sheet "Data" berhasil diinisialisasi dengan ' + COLUMNS.length + ' kolom!\nKolom: ' + COLUMNS.join(', '));
 }
