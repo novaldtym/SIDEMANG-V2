@@ -17,6 +17,7 @@ const COLUMNS = [
   'Pendidikan',
   'Pekerjaan',
   'Status_Nikah',
+  'Status_Kematian',
   'Jenis_UMKM',
   'Pembatik',
   'Jumlah_Pembatik',
@@ -119,6 +120,7 @@ function doPost(e) {
     // Auto-uppercase for consistency
     const pekerjaan = body.Pekerjaan ? String(body.Pekerjaan).toUpperCase() : '-';
     const statusNikah = body.Status_Nikah || '-';
+    const statusKematian = body.Status_Kematian || 'Hidup';
     const jenisUmkm = body.Jenis_UMKM ? String(body.Jenis_UMKM).toUpperCase() : '-';
 
     const pembatik = body.Pembatik || body.Keluarga_Pembatik || 'Tidak';
@@ -145,6 +147,7 @@ function doPost(e) {
         pendidikan,        // Pendidikan
         pekerjaan,         // Pekerjaan
         statusNikah,       // Status_Nikah
+        statusKematian,    // Status_Kematian
         jenisUmkm,         // Jenis_UMKM
         pembatik,          // Pembatik
         jumlahPembatik,    // Jumlah_Pembatik
@@ -206,6 +209,7 @@ function doPost(e) {
         pendidikan,
         pekerjaan,
         statusNikah,
+        statusKematian,
         jenisUmkm,
         pembatik,
         jumlahPembatik,

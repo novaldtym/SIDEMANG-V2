@@ -229,6 +229,15 @@
                   <option value="Cerai Mati">Cerai Mati</option>
                 </select>
               </div>
+
+              <!-- Status Kematian -->
+              <div>
+                <label for="Status_Kematian" class="block text-sm font-semibold text-gray-700 mb-1.5">Kondisi Warga</label>
+                <select id="Status_Kematian" name="Status_Kematian" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm bg-white">
+                  <option value="Hidup" selected>Hidup</option>
+                  <option value="Meninggal">Meninggal</option>
+                </select>
+              </div>
             </div>
           </div>
 
@@ -314,17 +323,33 @@
 
             <div class="space-y-5">
               <div>
-                <label for="Bantuan" class="block text-sm font-semibold text-gray-700 mb-1.5">Bantuan</label>
-                <select id="Bantuan" name="Bantuan" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm bg-white">
-                  <option value="" disabled selected>Pilih jenis bantuan</option>
-                  <option value="Tidak Ada">Tidak Ada</option>
-                  <option value="Bantuan JSLU">Bantuan JSLU</option>
-                  <option value="BLT">BLT</option>
-                  <option value="PKH">PKH</option>
-                  <option value="BPNT">BPNT</option>
-                  <option value="KIS/BPJS">KIS/BPJS</option>
-                  <option value="Bantuan Lainnya">Bantuan Lainnya</option>
-                </select>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Bantuan <span class="text-xs text-gray-400 font-normal">(pilih satu atau lebih)</span></label>
+                <div id="bantuanCheckboxGroup" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <label class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-gray-200 hover:border-primary/40 hover:bg-green-50/50 cursor-pointer transition-all">
+                    <input type="checkbox" name="bantuan_item" value="Bantuan JSLU" class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary/30 accent-primary">
+                    <span class="text-sm text-gray-700">Bantuan JSLU</span>
+                  </label>
+                  <label class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-gray-200 hover:border-primary/40 hover:bg-green-50/50 cursor-pointer transition-all">
+                    <input type="checkbox" name="bantuan_item" value="BLT" class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary/30 accent-primary">
+                    <span class="text-sm text-gray-700">BLT</span>
+                  </label>
+                  <label class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-gray-200 hover:border-primary/40 hover:bg-green-50/50 cursor-pointer transition-all">
+                    <input type="checkbox" name="bantuan_item" value="PKH" class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary/30 accent-primary">
+                    <span class="text-sm text-gray-700">PKH</span>
+                  </label>
+                  <label class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-gray-200 hover:border-primary/40 hover:bg-green-50/50 cursor-pointer transition-all">
+                    <input type="checkbox" name="bantuan_item" value="BPNT" class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary/30 accent-primary">
+                    <span class="text-sm text-gray-700">BPNT</span>
+                  </label>
+                  <label class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-gray-200 hover:border-primary/40 hover:bg-green-50/50 cursor-pointer transition-all">
+                    <input type="checkbox" name="bantuan_item" value="KIS/BPJS" class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary/30 accent-primary">
+                    <span class="text-sm text-gray-700">KIS/BPJS</span>
+                  </label>
+                  <label class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-gray-200 hover:border-primary/40 hover:bg-green-50/50 cursor-pointer transition-all">
+                    <input type="checkbox" name="bantuan_item" value="Lainnya" id="bantuanLainnyaCheckbox" class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary/30 accent-primary">
+                    <span class="text-sm text-gray-700">Lainnya</span>
+                  </label>
+                </div>
                 <!-- Dynamic Lainnya for Bantuan -->
                 <div id="bantuanLainnyaWrap" class="mt-3 overflow-hidden transition-all duration-300 max-h-0 opacity-0">
                   <input type="text" id="bantuanLainnya" name="bantuanLainnya" placeholder="Tuliskan bantuan lainnya..." class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm">
@@ -458,7 +483,10 @@
             status.classList.remove('text-gray-500', 'text-red-500', 'text-yellow-600');
             status.classList.add('text-green-600');
           }
-          document.getElementById('Bantuan').value = 'Tidak Ada';
+          document.querySelectorAll('input[name="bantuan_item"]').forEach(function (cb) { cb.checked = false; });
+          document.getElementById('bantuanLainnyaWrap').style.maxHeight = '0';
+          document.getElementById('bantuanLainnyaWrap').style.opacity = '0';
+          document.getElementById('bantuanLainnya').value = '';
           document.getElementById('sectionBantuan').style.display = 'none';
         } else {
           kkError.classList.add('hidden');
@@ -514,20 +542,33 @@
       }
     });
 
-    // ---- Dynamic "Lainnya" for Bantuan ----
-    const bantuanSelect = document.getElementById('Bantuan');
-    const bantuanLainnyaWrap = document.getElementById('bantuanLainnyaWrap');
-
-    bantuanSelect.addEventListener('change', function () {
-      if (this.value === 'Bantuan Lainnya') {
-        bantuanLainnyaWrap.style.maxHeight = '80px';
-        bantuanLainnyaWrap.style.opacity = '1';
+    // ---- Bantuan "Lainnya" Checkbox Toggle ----
+    document.getElementById('bantuanLainnyaCheckbox').addEventListener('change', function () {
+      const wrap = document.getElementById('bantuanLainnyaWrap');
+      if (this.checked) {
+        wrap.style.maxHeight = '80px';
+        wrap.style.opacity = '1';
       } else {
-        bantuanLainnyaWrap.style.maxHeight = '0';
-        bantuanLainnyaWrap.style.opacity = '0';
+        wrap.style.maxHeight = '0';
+        wrap.style.opacity = '0';
         document.getElementById('bantuanLainnya').value = '';
       }
     });
+
+    // ---- Collect multi-Bantuan values ----
+    function getBantuanValue() {
+      const checked = document.querySelectorAll('input[name="bantuan_item"]:checked');
+      const values = [];
+      checked.forEach(function (cb) {
+        if (cb.value === 'Lainnya') {
+          const custom = document.getElementById('bantuanLainnya').value.trim();
+          if (custom) values.push(custom);
+        } else {
+          values.push(cb.value);
+        }
+      });
+      return values.length > 0 ? values.join(', ') : 'Tidak Ada';
+    }
 
     // ---- UMKM "Lainnya" Checkbox Toggle ----
     document.getElementById('umkmLainnyaCheckbox').addEventListener('change', function () {
@@ -687,13 +728,6 @@
         pekerjaanVal = lainnya || 'Lainnya';
       }
 
-      // Determine Bantuan value
-      let bantuanVal = document.getElementById('Bantuan').value;
-      if (bantuanVal === 'Bantuan Lainnya') {
-        const lainnya = document.getElementById('bantuanLainnya').value.trim();
-        bantuanVal = lainnya || 'Bantuan Lainnya';
-      }
-
       // Get RT
       const rtRadio = document.querySelector('input[name="RT"]:checked');
       const rtVal = rtRadio ? rtRadio.value : '';
@@ -711,10 +745,11 @@
         Pendidikan: document.getElementById('Pendidikan').value,
         Pekerjaan: pekerjaanVal,
         Status_Nikah: document.getElementById('Status_Nikah').value,
+        Status_Kematian: document.getElementById('Status_Kematian').value,
         Jenis_UMKM: getUmkmValue(),
         Keluarga_Pembatik: document.getElementById('Keluarga_Pembatik').value,
         Jumlah_Pembatik: document.getElementById('Jumlah_Pembatik').value || '0',
-        Bantuan: bantuanVal,
+        Bantuan: getBantuanValue(),
         Latitude: document.getElementById('Latitude').value,
         Longitude: document.getElementById('Longitude').value
       };
@@ -752,6 +787,7 @@
             document.getElementById('umkmLainnyaWrap').style.maxHeight = '0';
             document.getElementById('umkmLainnyaWrap').style.opacity = '0';
             document.getElementById('umkmLainnya').value = '';
+            document.querySelectorAll('input[name="bantuan_item"]').forEach(function (cb) { cb.checked = false; });
             document.getElementById('bantuanLainnyaWrap').style.maxHeight = '0';
             document.getElementById('bantuanLainnyaWrap').style.opacity = '0';
             document.getElementById('bantuanLainnya').value = '';
@@ -786,10 +822,10 @@
             document.getElementById('umkmLainnyaWrap').style.maxHeight = '0';
             document.getElementById('umkmLainnyaWrap').style.opacity = '0';
             document.getElementById('umkmLainnya').value = '';
+            document.querySelectorAll('input[name="bantuan_item"]').forEach(function (cb) { cb.checked = false; });
             document.getElementById('bantuanLainnyaWrap').style.maxHeight = '0';
             document.getElementById('bantuanLainnyaWrap').style.opacity = '0';
             document.getElementById('bantuanLainnya').value = '';
-            document.getElementById('Bantuan').value = 'Tidak Ada';
             document.getElementById('sectionBantuan').style.display = 'none';
             if (pembatikActive) togglePembatikSwitch();
           }

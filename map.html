@@ -627,7 +627,10 @@ function buildPopup(group) {
             return `
                 <div style="padding: 6px 0; border-bottom: 1px dashed #e5e7eb; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.backgroundColor='#f3f4f6'" onmouseout="this.style.backgroundColor='transparent'" onclick="var el = document.getElementById('${uid}'); if(el.style.display==='none'){el.style.display='block';}else{el.style.display='none';}">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <div style="font-weight:600; font-size:0.8rem; color:#374151;">${m.Nama_Lengkap || '-'}</div>
+                        <div style="font-weight:600; font-size:0.8rem; color:#374151; display:flex; align-items:center; gap:4px;">
+                            ${m.Nama_Lengkap || '-'}
+                            ${String(m.Status_Kematian || '').trim().toUpperCase() === 'MENINGGAL' ? '<span style="font-size:0.65rem; background:#fee2e2; color:#b91c1c; padding:2px 4px; border-radius:4px; font-weight:bold; line-height:1;">Meninggal</span>' : ''}
+                        </div>
                         <div style="font-size:0.75rem; color:#6b7280; text-align:right;">${usia} · ${info} <span style="font-size:0.6rem; color:#069C67; margin-left:4px;">▼</span></div>
                     </div>
                     <div id="${uid}" style="display: none; margin-top: 8px; font-size: 0.75rem; color: #4b5563; padding: 6px 8px; border-left: 2px solid #069C67; background: #fff; border-radius: 0 4px 4px 0;">
@@ -653,7 +656,10 @@ function buildPopup(group) {
 
     return `
         <div style="font-family:'Inter',system-ui,sans-serif; padding: 16px; min-width: 260px; max-width: 320px;">
-            <h3 style="font-weight:800; font-size:1.1rem; color:#111827; margin:0 0 6px 0;">${primary.Nama_Lengkap || '-'}</h3>
+            <h3 style="font-weight:800; font-size:1.1rem; color:#111827; margin:0 0 6px 0; display:flex; align-items:center; flex-wrap:wrap; gap:6px;">
+                ${primary.Nama_Lengkap || '-'}
+                ${String(primary.Status_Kematian || '').trim().toUpperCase() === 'MENINGGAL' ? '<span style="font-size:0.7rem; background:#fee2e2; color:#b91c1c; padding:2px 6px; border-radius:4px; font-weight:bold; line-height:1.2; display:inline-block;">Meninggal</span>' : ''}
+            </h3>
             <p style="font-size:0.85rem; color:#6b7280; margin:0 0 4px; font-weight:500;">RT ${primary.RT || '-'} · ${primary.Usia || '-'} thn · ${primary.Jenis_Kelamin || '-'}</p>
 
             <div style="margin-top: 10px; margin-bottom: 12px;">
