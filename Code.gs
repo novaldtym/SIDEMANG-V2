@@ -1,6 +1,7 @@
 // ============================================================
 // SI-DEMANG KREBET — Google Apps Script Backend
 // REST API for Village Demographic & UMKM Mapping
+// Supports CREATE and UPDATE actions
 // ============================================================
 
 const SHEET_NAME = 'Data';
@@ -12,6 +13,7 @@ const COLUMNS = [
   'Jenis_Kelamin',
   'RT',
   'Usia',
+  'Tanggal_Lahir',
   'Pendidikan',
   'Pekerjaan',
   'Status_Nikah',
@@ -23,6 +25,9 @@ const COLUMNS = [
   'Longitude'
 ];
 
+// ============================================================
+// GET — Read all data
+// ============================================================
 function doGet(e) {
   try {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
@@ -46,7 +51,7 @@ function doGet(e) {
     for (let r = 0; r < rows.length; r++) {
       const row = rows[r];
 
-      // Skip empty rows (no NIK or Nama)
+      // Skip completely empty rows
       const nikVal = String(row[2] || '').trim();
       const namaVal = String(row[3] || '').trim();
       if (!nikVal && !namaVal) continue;
@@ -71,6 +76,9 @@ function doGet(e) {
         }
         obj[col] = val;
       });
+
+      // Include the actual sheet row number for reference
+      obj._rowIndex = startIndex + r + 1; // 1-indexed sheet row
       result.push(obj);
     }
 
@@ -80,65 +88,147 @@ function doGet(e) {
   }
 }
 
+// ============================================================
+// POST — Create or Update data
+// ============================================================
 function doPost(e) {
   try {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
     if (!sheet) return buildJsonResponse({ success: false, error: 'Sheet not found' });
 
     const body = JSON.parse(e.postData.contents);
+    const action = String(body.action || 'create').toLowerCase();
 
     // Accept flexible field names
-    const namaLengkap = body.Nama_Lengkap || body.Nama || '';
-    const pembatik = body.Pembatik || body.Keluarga_Pembatik || 'Tidak';
-    const noKK = String(body.No_KK || '').trim();
+    const namaLengkap = body.Nama_Lengkap || body.Nama || '-';
 
-    // Validate required fields
-    if (!noKK) return buildJsonResponse({ success: false, error: 'Field "No_KK" wajib diisi.' });
-    if (!body.NIK) return buildJsonResponse({ success: false, error: 'Field "NIK" wajib diisi.' });
-    if (!namaLengkap) return buildJsonResponse({ success: false, error: 'Field "Nama" wajib diisi.' });
-    if (!body.Jenis_Kelamin) return buildJsonResponse({ success: false, error: 'Field "Jenis_Kelamin" wajib diisi.' });
-    if (!body.RT) return buildJsonResponse({ success: false, error: 'Field "RT" wajib diisi.' });
-    if (!body.Usia && body.Usia !== 0) return buildJsonResponse({ success: false, error: 'Field "Usia" wajib diisi.' });
-
-    // Parse coordinates (optional)
-    const lat = parseFloat(String(body.Latitude || '0').replace(',', '.'));
-    const lng = parseFloat(String(body.Longitude || '0').replace(',', '.'));
-
-    // Auto-uppercase for consistency
-    const pekerjaan = String(body.Pekerjaan || '-').toUpperCase();
-    const jenisUmkm = String(body.Jenis_UMKM || '-').toUpperCase();
-
-    sheet.appendRow([
-      new Date(),
-      noKK,
-      String(body.NIK),
-      namaLengkap,
-      body.Jenis_Kelamin || '-',
-      String(body.RT),
-      Number(body.Usia),
-      body.Pendidikan || '-',
-      pekerjaan,
-      body.Status_Nikah || '-',
-      jenisUmkm,
-      pembatik,
-      Number(body.Jumlah_Pembatik) || 0,
-      body.Bantuan || 'Tidak Ada',
-      lat,
-      lng
-    ]);
-
-    // Auto-sort by No_KK (column 2) to group families together
-    const lastRow = sheet.getLastRow();
-    if (lastRow > 2) {
-      sheet.getRange(2, 1, lastRow - 1, COLUMNS.length).sort(2);
+    // Soft validation — only Nama_Lengkap is truly required
+    if (!namaLengkap || namaLengkap === '-') {
+      return buildJsonResponse({ success: false, error: 'Field "Nama_Lengkap" wajib diisi.' });
     }
 
-    return buildJsonResponse({ success: true, message: 'Data berhasil disimpan!' });
+    // Build the row values with defaults for missing fields
+    const noKK = String(body.No_KK || '-').trim();
+    const nik = String(body.NIK || '-').trim();
+    const jenisKelamin = body.Jenis_Kelamin || '-';
+    const rt = String(body.RT || '-').trim();
+    const usia = (body.Usia !== undefined && body.Usia !== '') ? Number(body.Usia) : 0;
+    const tanggalLahir = body.Tanggal_Lahir || '-';
+    const pendidikan = body.Pendidikan || '-';
+
+    // Auto-uppercase for consistency
+    const pekerjaan = body.Pekerjaan ? String(body.Pekerjaan).toUpperCase() : '-';
+    const statusNikah = body.Status_Nikah || '-';
+    const jenisUmkm = body.Jenis_UMKM ? String(body.Jenis_UMKM).toUpperCase() : '-';
+
+    const pembatik = body.Pembatik || body.Keluarga_Pembatik || 'Tidak';
+    const jumlahPembatik = Number(body.Jumlah_Pembatik) || 0;
+    const bantuan = body.Bantuan || 'Tidak Ada';
+
+    // Parse coordinates
+    const lat = parseFloat(String(body.Latitude || '0').replace(',', '.'));
+    const lng = parseFloat(String(body.Longitude || '0').replace(',', '.'));
+    const latitude = isNaN(lat) ? 0 : lat;
+    const longitude = isNaN(lng) ? 0 : lng;
+
+    // ============ CREATE ============
+    if (action === 'create') {
+      const rowData = [
+        new Date(),        // Timestamp
+        noKK,              // No_KK
+        nik,               // NIK
+        namaLengkap,       // Nama_Lengkap
+        jenisKelamin,      // Jenis_Kelamin
+        rt,                // RT
+        usia,              // Usia
+        tanggalLahir,      // Tanggal_Lahir
+        pendidikan,        // Pendidikan
+        pekerjaan,         // Pekerjaan
+        statusNikah,       // Status_Nikah
+        jenisUmkm,         // Jenis_UMKM
+        pembatik,          // Pembatik
+        jumlahPembatik,    // Jumlah_Pembatik
+        bantuan,           // Bantuan
+        latitude,          // Latitude
+        longitude          // Longitude
+      ];
+
+      sheet.appendRow(rowData);
+
+      // Auto-sort by No_KK (column 2) to group families together
+      const lastRow = sheet.getLastRow();
+      if (lastRow > 2) {
+        sheet.getRange(2, 1, lastRow - 1, COLUMNS.length).sort(2);
+      }
+
+      return buildJsonResponse({ success: true, message: 'Data berhasil disimpan!' });
+    }
+
+    // ============ UPDATE ============
+    if (action === 'update') {
+      const targetTimestamp = body.Timestamp;
+      if (!targetTimestamp) {
+        return buildJsonResponse({ success: false, error: 'Timestamp diperlukan untuk update.' });
+      }
+
+      // Find the row by matching Timestamp
+      const lastRow = sheet.getLastRow();
+      if (lastRow < 2) {
+        return buildJsonResponse({ success: false, error: 'Tidak ada data untuk diupdate.' });
+      }
+
+      const timestamps = sheet.getRange(2, 1, lastRow - 1, 1).getValues(); // Column A (Timestamp)
+      let targetRow = -1;
+
+      for (let i = 0; i < timestamps.length; i++) {
+        const cellVal = timestamps[i][0];
+        const cellStr = (cellVal instanceof Date) ? cellVal.toISOString() : String(cellVal);
+        if (cellStr === targetTimestamp) {
+          targetRow = i + 2; // +2 because: +1 for header, +1 for 1-indexed
+          break;
+        }
+      }
+
+      if (targetRow === -1) {
+        return buildJsonResponse({ success: false, error: 'Data tidak ditemukan untuk diupdate.' });
+      }
+
+      // Build updated row (keep original timestamp)
+      const updatedRow = [
+        timestamps[targetRow - 2][0], // Keep original Timestamp
+        noKK,
+        nik,
+        namaLengkap,
+        jenisKelamin,
+        rt,
+        usia,
+        tanggalLahir,
+        pendidikan,
+        pekerjaan,
+        statusNikah,
+        jenisUmkm,
+        pembatik,
+        jumlahPembatik,
+        bantuan,
+        latitude,
+        longitude
+      ];
+
+      sheet.getRange(targetRow, 1, 1, COLUMNS.length).setValues([updatedRow]);
+
+      return buildJsonResponse({ success: true, message: 'Data berhasil diperbarui!' });
+    }
+
+    return buildJsonResponse({ success: false, error: 'Action tidak dikenal: ' + action });
+
   } catch (error) {
     return buildJsonResponse({ success: false, error: error.message });
   }
 }
 
+// ============================================================
+// Helpers
+// ============================================================
 function buildJsonResponse(data) {
   return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON);
 }
@@ -148,7 +238,6 @@ function initializeSheet() {
   let sheet = ss.getSheetByName(SHEET_NAME);
   if (!sheet) sheet = ss.insertSheet(SHEET_NAME);
 
-  // Clear existing data (user confirmed dummy data can be overwritten)
   sheet.clearContents();
 
   sheet.getRange(1, 1, 1, COLUMNS.length).setValues([COLUMNS]).setFontWeight('bold').setBackground('#069C67').setFontColor('#fff');

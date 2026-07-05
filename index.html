@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="SI-DEMANG — Sistem Informasi Demografi & Pemetaan UMKM Desa Krebet, Pajangan, Bantul. Input data penduduk dan UMKM warga.">
+  <meta name="description" content="SI-DEMANG — Sistem Informasi Demografi &amp; Pemetaan UMKM Desa Krebet, Pajangan, Bantul. Input data penduduk dan UMKM warga.">
   <meta name="keywords" content="demografi, UMKM, Krebet, Pajangan, Bantul, KKN UPN, pendataan warga, pemetaan desa">
   <meta name="author" content="KKN UPN Veteran Yogyakarta 2026">
   <meta name="robots" content="index, follow">
   <meta property="og:title" content="SI-DEMANG Krebet — Pendataan Warga">
-  <meta property="og:description" content="Sistem Informasi Demografi & Pemetaan UMKM Desa Krebet, Pajangan, Bantul">
+  <meta property="og:description" content="Sistem Informasi Demografi &amp; Pemetaan UMKM Desa Krebet, Pajangan, Bantul">
   <meta property="og:type" content="website">
   <meta name="theme-color" content="#069C67">
   <title>Input Data — SI-DEMANG Krebet</title>
@@ -37,7 +37,7 @@
   <aside id="sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen bg-primary flex flex-col transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
     <!-- Logo & Title -->
     <div class="pt-8 pb-6 px-6">
-      <img src="assets/logo-sidemang.png" alt="Krebetter" class="w-20 h-20 mx-auto rounded-full bg-white p-1">
+      <img src="assets/logo-sidemang.png" alt="Krebetter" class="w-20 h-20 mx-auto">
       <h1 class="text-center text-white font-bold text-lg mt-2">SI-DEMANG</h1>
       <p class="text-center text-green-200 text-xs">Krebet, Pajangan, Bantul</p>
     </div>
@@ -111,27 +111,27 @@
               <!-- No KK -->
               <div>
                 <label for="No_KK" class="block text-sm font-semibold text-gray-700 mb-1.5">No. KK (Kartu Keluarga) <span class="text-red-500">*</span></label>
-                <input type="text" id="No_KK" name="No_KK" inputmode="numeric" pattern="\d{16}" maxlength="16" required placeholder="Masukkan 16 digit No. KK" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm">
+                <input type="text" id="No_KK" name="No_KK" inputmode="numeric" maxlength="16" placeholder="Masukkan 16 digit No. KK" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm">
                 <p id="kkError" class="text-xs text-red-500 mt-1 hidden">No. KK harus terdiri dari 16 digit angka.</p>
               </div>
 
               <!-- NIK -->
               <div>
-                <label for="NIK" class="block text-sm font-semibold text-gray-700 mb-1.5">NIK <span class="text-red-500">*</span></label>
-                <input type="text" id="NIK" name="NIK" inputmode="numeric" pattern="\d{16}" maxlength="16" required placeholder="Masukkan 16 digit NIK" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm">
+                <label for="NIK" class="block text-sm font-semibold text-gray-700 mb-1.5">NIK</label>
+                <input type="text" id="NIK" name="NIK" inputmode="numeric" maxlength="16" placeholder="Masukkan 16 digit NIK" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm">
                 <p id="nikError" class="text-xs text-red-500 mt-1 hidden">NIK harus terdiri dari 16 digit angka.</p>
               </div>
 
               <!-- Nama Lengkap -->
               <div>
                 <label for="Nama" class="block text-sm font-semibold text-gray-700 mb-1.5">Nama Lengkap <span class="text-red-500">*</span></label>
-                <input type="text" id="Nama" name="Nama" required placeholder="Nama sesuai KTP" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm">
+                <input type="text" id="Nama" name="Nama" placeholder="Nama sesuai KTP" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm">
               </div>
 
               <!-- Jenis Kelamin -->
               <div>
-                <label for="Jenis_Kelamin" class="block text-sm font-semibold text-gray-700 mb-1.5">Jenis Kelamin <span class="text-red-500">*</span></label>
-                <select id="Jenis_Kelamin" name="Jenis_Kelamin" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm bg-white">
+                <label for="Jenis_Kelamin" class="block text-sm font-semibold text-gray-700 mb-1.5">Jenis Kelamin</label>
+                <select id="Jenis_Kelamin" name="Jenis_Kelamin" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm bg-white">
                   <option value="" disabled selected>Pilih jenis kelamin</option>
                   <option value="Laki-laki">Laki-laki</option>
                   <option value="Perempuan">Perempuan</option>
@@ -140,10 +140,10 @@
 
               <!-- RT (Radio Group) -->
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1.5">RT <span class="text-red-500">*</span></label>
+                <label class="block text-sm font-semibold text-gray-700 mb-1.5">RT</label>
                 <div class="flex gap-3">
                   <label class="cursor-pointer">
-                    <input type="radio" name="RT" value="1" class="hidden peer" required>
+                    <input type="radio" name="RT" value="1" class="hidden peer">
                     <span class="inline-flex items-center justify-center w-12 h-12 rounded-xl border-2 border-gray-300 text-gray-600 font-bold text-lg peer-checked:border-accent peer-checked:bg-accent/20 peer-checked:text-primary transition-all">1</span>
                   </label>
                   <label class="cursor-pointer">
@@ -165,10 +165,17 @@
                 </div>
               </div>
 
+              <!-- Tanggal Lahir (NEW) -->
+              <div>
+                <label for="Tanggal_Lahir" class="block text-sm font-semibold text-gray-700 mb-1.5">Tanggal Lahir</label>
+                <input type="date" id="Tanggal_Lahir" name="Tanggal_Lahir" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm">
+                <p class="text-xs text-gray-400 mt-1">Usia akan dihitung otomatis jika tanggal lahir diisi.</p>
+              </div>
+
               <!-- Usia -->
               <div>
-                <label for="Usia" class="block text-sm font-semibold text-gray-700 mb-1.5">Usia <span class="text-red-500">*</span></label>
-                <input type="number" id="Usia" name="Usia" min="0" max="150" required placeholder="Contoh: 35" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm">
+                <label for="Usia" class="block text-sm font-semibold text-gray-700 mb-1.5">Usia</label>
+                <input type="number" id="Usia" name="Usia" min="0" max="150" placeholder="Contoh: 35" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm">
               </div>
 
               <!-- Pendidikan -->
@@ -234,21 +241,43 @@
             <p class="text-xs text-gray-400 mb-5 ml-9">Informasi usaha dan kegiatan batik warga</p>
 
             <div class="space-y-5">
-              <!-- Jenis UMKM -->
+              <!-- Jenis UMKM (Checkbox Group) -->
               <div>
-                <label for="Jenis_UMKM" class="block text-sm font-semibold text-gray-700 mb-1.5">Jenis UMKM</label>
-                <select id="Jenis_UMKM" name="Jenis_UMKM" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm bg-white">
-                  <option value="" disabled selected>Pilih jenis UMKM</option>
-                  <option value="Tidak Ada">Tidak Ada</option>
-                  <option value="Kerajinan Batik Kayu">Kerajinan Batik Kayu</option>
-                  <option value="Kuliner/Makanan">Kuliner/Makanan</option>
-                  <option value="Warung/Toko Kelontong">Warung/Toko Kelontong</option>
-                  <option value="Pertanian/Perkebunan">Pertanian/Perkebunan</option>
-                  <option value="Jasa">Jasa</option>
-                  <option value="Konveksi/Tekstil">Konveksi/Tekstil</option>
-                  <option value="Kerajinan Tangan">Kerajinan Tangan</option>
-                  <option value="Lainnya">Lainnya</option>
-                </select>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Jenis UMKM <span class="text-xs text-gray-400 font-normal">(pilih satu atau lebih)</span></label>
+                <div id="umkmCheckboxGroup" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <label class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-gray-200 hover:border-primary/40 hover:bg-green-50/50 cursor-pointer transition-all">
+                    <input type="checkbox" name="umkm_item" value="Kerajinan Batik Kayu" class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary/30 accent-primary">
+                    <span class="text-sm text-gray-700">Kerajinan Batik Kayu</span>
+                  </label>
+                  <label class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-gray-200 hover:border-primary/40 hover:bg-green-50/50 cursor-pointer transition-all">
+                    <input type="checkbox" name="umkm_item" value="Kuliner/Makanan" class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary/30 accent-primary">
+                    <span class="text-sm text-gray-700">Kuliner/Makanan</span>
+                  </label>
+                  <label class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-gray-200 hover:border-primary/40 hover:bg-green-50/50 cursor-pointer transition-all">
+                    <input type="checkbox" name="umkm_item" value="Warung/Toko Kelontong" class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary/30 accent-primary">
+                    <span class="text-sm text-gray-700">Warung/Toko Kelontong</span>
+                  </label>
+                  <label class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-gray-200 hover:border-primary/40 hover:bg-green-50/50 cursor-pointer transition-all">
+                    <input type="checkbox" name="umkm_item" value="Pertanian/Perkebunan" class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary/30 accent-primary">
+                    <span class="text-sm text-gray-700">Pertanian/Perkebunan</span>
+                  </label>
+                  <label class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-gray-200 hover:border-primary/40 hover:bg-green-50/50 cursor-pointer transition-all">
+                    <input type="checkbox" name="umkm_item" value="Jasa" class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary/30 accent-primary">
+                    <span class="text-sm text-gray-700">Jasa</span>
+                  </label>
+                  <label class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-gray-200 hover:border-primary/40 hover:bg-green-50/50 cursor-pointer transition-all">
+                    <input type="checkbox" name="umkm_item" value="Konveksi/Tekstil" class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary/30 accent-primary">
+                    <span class="text-sm text-gray-700">Konveksi/Tekstil</span>
+                  </label>
+                  <label class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-gray-200 hover:border-primary/40 hover:bg-green-50/50 cursor-pointer transition-all">
+                    <input type="checkbox" name="umkm_item" value="Kerajinan Tangan" class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary/30 accent-primary">
+                    <span class="text-sm text-gray-700">Kerajinan Tangan</span>
+                  </label>
+                  <label class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-gray-200 hover:border-primary/40 hover:bg-green-50/50 cursor-pointer transition-all">
+                    <input type="checkbox" name="umkm_item" value="Lainnya" id="umkmLainnyaCheckbox" class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary/30 accent-primary">
+                    <span class="text-sm text-gray-700">Lainnya</span>
+                  </label>
+                </div>
                 <!-- Dynamic Lainnya for UMKM -->
                 <div id="umkmLainnyaWrap" class="mt-3 overflow-hidden transition-all duration-300 max-h-0 opacity-0">
                   <input type="text" id="umkmLainnya" name="umkmLainnya" placeholder="Tuliskan jenis UMKM lainnya..." class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm">
@@ -276,12 +305,12 @@
           </div>
 
           <!-- ===== SECTION C — Bantuan Sosial ===== -->
-          <div class="mb-8">
+          <div id="sectionBantuan" class="mb-8">
             <h2 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2">
               <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-primary/10 text-primary text-sm font-extrabold">C</span>
               Bantuan Sosial
             </h2>
-            <p class="text-xs text-gray-400 mb-5 ml-9">Data penerima bantuan sosial</p>
+            <p class="text-xs text-gray-400 mb-5 ml-9">Data penerima bantuan sosial (Khusus untuk orang pertama/Kepala Keluarga)</p>
 
             <div class="space-y-5">
               <div>
@@ -296,6 +325,10 @@
                   <option value="KIS/BPJS">KIS/BPJS</option>
                   <option value="Bantuan Lainnya">Bantuan Lainnya</option>
                 </select>
+                <!-- Dynamic Lainnya for Bantuan -->
+                <div id="bantuanLainnyaWrap" class="mt-3 overflow-hidden transition-all duration-300 max-h-0 opacity-0">
+                  <input type="text" id="bantuanLainnya" name="bantuanLainnya" placeholder="Tuliskan bantuan lainnya..." class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm">
+                </div>
               </div>
             </div>
           </div>
@@ -329,10 +362,17 @@
             </div>
           </div>
 
-          <!-- ===== SUBMIT ===== -->
-          <button type="submit" id="btnSubmit" class="w-full py-3.5 bg-primary hover:bg-primary-dark text-white font-bold text-base rounded-xl shadow-lg transition-all active:scale-[0.98]">
-            Kirim Data
-          </button>
+          <!-- ===== DUAL SUBMIT BUTTONS ===== -->
+          <div class="flex flex-col sm:flex-row gap-3">
+            <button type="button" id="btnSimpanTambah" class="flex-1 py-3.5 bg-primary hover:bg-primary-dark text-white font-bold text-sm rounded-xl shadow-lg transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+              Simpan & Tambah Anggota KK
+            </button>
+            <button type="button" id="btnSimpanSelesai" class="flex-1 py-3.5 bg-accent hover:bg-accent-dark text-gray-800 font-bold text-sm rounded-xl shadow-lg transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+              Simpan & Selesai
+            </button>
+          </div>
 
         </form>
       </div>
@@ -364,6 +404,71 @@
   <script>
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbyLxbUHn3H81fZDcZi5o2zgdiIR8bdMwS2P13dACunGvjrF-aoVOsc_fKJWkCOW-oeP/exec';
 
+    // ---- Fetch Existing KKs for Smart Continuation ----
+    const existingKKs = {};
+    let dataLoaded = false;
+
+    async function loadExistingData() {
+      try {
+        const res = await fetch(GAS_URL);
+        const json = await res.json();
+        const data = json.data || json;
+        if (Array.isArray(data)) {
+          data.forEach(d => {
+            if (d.No_KK) {
+              const kkString = String(d.No_KK).trim();
+              if (!existingKKs[kkString]) {
+                existingKKs[kkString] = {
+                  RT: d.RT,
+                  Latitude: d.Latitude,
+                  Longitude: d.Longitude
+                };
+              }
+            }
+          });
+        }
+        dataLoaded = true;
+        checkExistingKK();
+      } catch (err) {
+        console.error('Gagal memuat data existing KK:', err);
+      }
+    }
+    loadExistingData();
+
+    function checkExistingKK() {
+      const kkInput = document.getElementById('No_KK');
+      const kkError = document.getElementById('kkError');
+      if (kkInput.value.length === 16) {
+        const kk = kkInput.value;
+        if (existingKKs[kk]) {
+          kkError.classList.remove('hidden');
+          kkError.textContent = 'ℹ️ KK sudah terdaftar. Melanjutkan penambahan anggota.';
+          kkError.classList.remove('text-red-500');
+          kkError.classList.add('text-blue-600');
+          
+          if (existingKKs[kk].RT) {
+            const rtEl = document.querySelector('input[name="RT"][value="' + existingKKs[kk].RT + '"]');
+            if (rtEl) rtEl.checked = true;
+          }
+          if (existingKKs[kk].Latitude && existingKKs[kk].Longitude) {
+            document.getElementById('Latitude').value = existingKKs[kk].Latitude;
+            document.getElementById('Longitude').value = existingKKs[kk].Longitude;
+            const status = document.getElementById('geoStatus');
+            status.textContent = '✅ Lokasi disalin dari data KK sebelumnya.';
+            status.classList.remove('text-gray-500', 'text-red-500', 'text-yellow-600');
+            status.classList.add('text-green-600');
+          }
+          document.getElementById('Bantuan').value = 'Tidak Ada';
+          document.getElementById('sectionBantuan').style.display = 'none';
+        } else {
+          kkError.classList.add('hidden');
+          kkError.classList.remove('text-blue-600');
+          kkError.classList.add('text-red-500');
+          document.getElementById('sectionBantuan').style.display = 'block';
+        }
+      }
+    }
+
     // ---- Sidebar Toggle (Mobile) ----
     const sidebar = document.getElementById('sidebar');
     const sidebarOverlay = document.getElementById('sidebarOverlay');
@@ -380,6 +485,20 @@
       document.body.style.overflow = '';
     }
 
+    // ---- Tanggal Lahir → Auto-calculate Usia ----
+    document.getElementById('Tanggal_Lahir').addEventListener('change', function () {
+      if (this.value) {
+        const birthDate = new Date(this.value);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+          age--;
+        }
+        document.getElementById('Usia').value = age >= 0 ? age : 0;
+      }
+    });
+
     // ---- Dynamic "Lainnya" for Pekerjaan ----
     const pekerjaanSelect = document.getElementById('Pekerjaan');
     const pekerjaanLainnyaWrap = document.getElementById('pekerjaanLainnyaWrap');
@@ -395,20 +514,48 @@
       }
     });
 
-    // ---- Dynamic "Lainnya" for UMKM ----
-    const umkmSelect = document.getElementById('Jenis_UMKM');
-    const umkmLainnyaWrap = document.getElementById('umkmLainnyaWrap');
+    // ---- Dynamic "Lainnya" for Bantuan ----
+    const bantuanSelect = document.getElementById('Bantuan');
+    const bantuanLainnyaWrap = document.getElementById('bantuanLainnyaWrap');
 
-    umkmSelect.addEventListener('change', function () {
-      if (this.value === 'Lainnya') {
-        umkmLainnyaWrap.style.maxHeight = '80px';
-        umkmLainnyaWrap.style.opacity = '1';
+    bantuanSelect.addEventListener('change', function () {
+      if (this.value === 'Bantuan Lainnya') {
+        bantuanLainnyaWrap.style.maxHeight = '80px';
+        bantuanLainnyaWrap.style.opacity = '1';
       } else {
-        umkmLainnyaWrap.style.maxHeight = '0';
-        umkmLainnyaWrap.style.opacity = '0';
+        bantuanLainnyaWrap.style.maxHeight = '0';
+        bantuanLainnyaWrap.style.opacity = '0';
+        document.getElementById('bantuanLainnya').value = '';
+      }
+    });
+
+    // ---- UMKM "Lainnya" Checkbox Toggle ----
+    document.getElementById('umkmLainnyaCheckbox').addEventListener('change', function () {
+      const wrap = document.getElementById('umkmLainnyaWrap');
+      if (this.checked) {
+        wrap.style.maxHeight = '80px';
+        wrap.style.opacity = '1';
+      } else {
+        wrap.style.maxHeight = '0';
+        wrap.style.opacity = '0';
         document.getElementById('umkmLainnya').value = '';
       }
     });
+
+    // ---- Collect multi-UMKM values ----
+    function getUmkmValue() {
+      const checked = document.querySelectorAll('input[name="umkm_item"]:checked');
+      const values = [];
+      checked.forEach(function (cb) {
+        if (cb.value === 'Lainnya') {
+          const custom = document.getElementById('umkmLainnya').value.trim();
+          if (custom) values.push(custom);
+        } else {
+          values.push(cb.value);
+        }
+      });
+      return values.length > 0 ? values.join(', ') : 'Tidak Ada';
+    }
 
     // ---- Pembatik Toggle Switch ----
     let pembatikActive = false;
@@ -480,7 +627,7 @@
       );
     }
 
-    // ---- No KK Validation (digits only) ----
+    // ---- No KK Validation (digits only, warning only) ----
     const kkInput = document.getElementById('No_KK');
     const kkError = document.getElementById('kkError');
 
@@ -488,12 +635,19 @@
       this.value = this.value.replace(/\D/g, '').slice(0, 16);
       if (this.value.length > 0 && this.value.length < 16) {
         kkError.classList.remove('hidden');
+        kkError.textContent = 'No. KK harus terdiri dari 16 digit angka.';
+        kkError.classList.remove('text-blue-600');
+        kkError.classList.add('text-red-500');
+        document.getElementById('sectionBantuan').style.display = 'block';
+      } else if (this.value.length === 16) {
+        checkExistingKK();
       } else {
         kkError.classList.add('hidden');
+        document.getElementById('sectionBantuan').style.display = 'block';
       }
     });
 
-    // ---- NIK Validation (digits only) ----
+    // ---- NIK Validation (digits only, warning only) ----
     const nikInput = document.getElementById('NIK');
     const nikError = document.getElementById('nikError');
 
@@ -506,30 +660,23 @@
       }
     });
 
-    // ---- Form Submit ----
-    document.getElementById('formPendataan').addEventListener('submit', function (e) {
-      e.preventDefault();
+    // ---- Auto Uppercase Text Inputs ----
+    document.querySelectorAll('input[type="text"]').forEach(function(input) {
+      input.addEventListener('input', function() {
+        var start = this.selectionStart;
+        var end = this.selectionEnd;
+        this.value = this.value.toUpperCase();
+        this.setSelectionRange(start, end);
+      });
+    });
 
-      // Validate No KK
-      const kk = kkInput.value.trim();
-      if (!/^\d{16}$/.test(kk)) {
-        kkError.classList.remove('hidden');
-        kkInput.focus();
-        return;
-      }
-
-      // Validate NIK
-      const nik = nikInput.value.trim();
-      if (!/^\d{16}$/.test(nik)) {
-        nikError.classList.remove('hidden');
-        nikInput.focus();
-        return;
-      }
-
-      // Get RT from radio
-      const rtRadio = document.querySelector('input[name="RT"]:checked');
-      if (!rtRadio) {
-        alert('Silakan pilih RT terlebih dahulu.');
+    // ---- Shared Submit Function ----
+    function submitForm(resetMode) {
+      // Validate only Nama Lengkap
+      const namaInput = document.getElementById('Nama');
+      if (!namaInput.value.trim()) {
+        alert('Nama Lengkap wajib diisi.');
+        namaInput.focus();
         return;
       }
 
@@ -540,40 +687,46 @@
         pekerjaanVal = lainnya || 'Lainnya';
       }
 
-      // Determine UMKM value
-      let umkmVal = umkmSelect.value;
-      if (umkmVal === 'Lainnya') {
-        const lainnya = document.getElementById('umkmLainnya').value.trim();
-        umkmVal = lainnya || 'Lainnya';
+      // Determine Bantuan value
+      let bantuanVal = document.getElementById('Bantuan').value;
+      if (bantuanVal === 'Bantuan Lainnya') {
+        const lainnya = document.getElementById('bantuanLainnya').value.trim();
+        bantuanVal = lainnya || 'Bantuan Lainnya';
       }
+
+      // Get RT
+      const rtRadio = document.querySelector('input[name="RT"]:checked');
+      const rtVal = rtRadio ? rtRadio.value : '';
 
       // Build payload
       const payload = {
-        No_KK: kk,
-        NIK: nik,
-        Nama: document.getElementById('Nama').value.trim(),
+        action: 'create',
+        No_KK: kkInput.value.trim(),
+        NIK: nikInput.value.trim(),
+        Nama_Lengkap: namaInput.value.trim(),
         Jenis_Kelamin: document.getElementById('Jenis_Kelamin').value,
-        RT: rtRadio.value,
+        RT: rtVal,
         Usia: document.getElementById('Usia').value,
+        Tanggal_Lahir: document.getElementById('Tanggal_Lahir').value,
         Pendidikan: document.getElementById('Pendidikan').value,
         Pekerjaan: pekerjaanVal,
         Status_Nikah: document.getElementById('Status_Nikah').value,
-        Jenis_UMKM: umkmVal,
+        Jenis_UMKM: getUmkmValue(),
         Keluarga_Pembatik: document.getElementById('Keluarga_Pembatik').value,
         Jumlah_Pembatik: document.getElementById('Jumlah_Pembatik').value || '0',
-        Bantuan: document.getElementById('Bantuan').value,
+        Bantuan: bantuanVal,
         Latitude: document.getElementById('Latitude').value,
         Longitude: document.getElementById('Longitude').value
       };
 
-      // Disable submit button
-      const btn = document.getElementById('btnSubmit');
-      const originalText = btn.textContent;
-      btn.disabled = true;
-      btn.textContent = 'Mengirim...';
-      btn.classList.add('opacity-70', 'cursor-not-allowed');
+      // Disable both buttons
+      const btnTambah = document.getElementById('btnSimpanTambah');
+      const btnSelesai = document.getElementById('btnSimpanSelesai');
+      btnTambah.disabled = true;
+      btnSelesai.disabled = true;
+      btnTambah.classList.add('opacity-70', 'cursor-not-allowed');
+      btnSelesai.classList.add('opacity-70', 'cursor-not-allowed');
 
-      // POST to GAS (mode: no-cors is required for reliable GAS communication)
       fetch(GAS_URL, {
         method: 'POST',
         mode: 'no-cors',
@@ -581,32 +734,81 @@
         body: JSON.stringify(payload)
       })
         .then(function () {
-          // With no-cors, response is opaque but data IS sent successfully
           alert('✅ Data berhasil dikirim! Terima kasih.');
-          document.getElementById('formPendataan').reset();
-          // Reset dynamic fields
-          pekerjaanLainnyaWrap.style.maxHeight = '0';
-          pekerjaanLainnyaWrap.style.opacity = '0';
-          umkmLainnyaWrap.style.maxHeight = '0';
-          umkmLainnyaWrap.style.opacity = '0';
-          // Reset pembatik toggle
-          if (pembatikActive) togglePembatikSwitch();
-          // Reset geo
-          document.getElementById('Latitude').value = '';
-          document.getElementById('Longitude').value = '';
-          document.getElementById('geoStatus').textContent = 'Tekan tombol di atas untuk mengambil lokasi GPS.';
-          document.getElementById('geoStatus').className = 'text-xs text-gray-500 text-center';
+
+          // Save locally so immediate continuation works
+          existingKKs[payload.No_KK] = {
+            RT: payload.RT,
+            Latitude: payload.Latitude,
+            Longitude: payload.Longitude
+          };
+
+          if (resetMode === 'full') {
+            // Full reset — clear everything
+            document.getElementById('formPendataan').reset();
+            pekerjaanLainnyaWrap.style.maxHeight = '0';
+            pekerjaanLainnyaWrap.style.opacity = '0';
+            document.querySelectorAll('input[name="umkm_item"]').forEach(function (cb) { cb.checked = false; });
+            document.getElementById('umkmLainnyaWrap').style.maxHeight = '0';
+            document.getElementById('umkmLainnyaWrap').style.opacity = '0';
+            document.getElementById('umkmLainnya').value = '';
+            document.getElementById('bantuanLainnyaWrap').style.maxHeight = '0';
+            document.getElementById('bantuanLainnyaWrap').style.opacity = '0';
+            document.getElementById('bantuanLainnya').value = '';
+            document.getElementById('sectionBantuan').style.display = 'block';
+            if (pembatikActive) togglePembatikSwitch();
+            document.getElementById('Latitude').value = '';
+            document.getElementById('Longitude').value = '';
+            document.getElementById('geoStatus').textContent = 'Tekan tombol di atas untuk mengambil lokasi GPS.';
+            document.getElementById('geoStatus').className = 'text-xs text-gray-500 text-center';
+          } else {
+            // Partial reset — keep No_KK, RT, GPS
+            var keepKK = document.getElementById('No_KK').value;
+            var keepLat = document.getElementById('Latitude').value;
+            var keepLng = document.getElementById('Longitude').value;
+            var keepRT = rtRadio ? rtRadio.value : null;
+
+            document.getElementById('formPendataan').reset();
+
+            // Restore kept values
+            document.getElementById('No_KK').value = keepKK;
+            document.getElementById('Latitude').value = keepLat;
+            document.getElementById('Longitude').value = keepLng;
+            if (keepRT) {
+              var rtEl = document.querySelector('input[name="RT"][value="' + keepRT + '"]');
+              if (rtEl) rtEl.checked = true;
+            }
+
+            // Reset dynamic fields
+            pekerjaanLainnyaWrap.style.maxHeight = '0';
+            pekerjaanLainnyaWrap.style.opacity = '0';
+            document.querySelectorAll('input[name="umkm_item"]').forEach(function (cb) { cb.checked = false; });
+            document.getElementById('umkmLainnyaWrap').style.maxHeight = '0';
+            document.getElementById('umkmLainnyaWrap').style.opacity = '0';
+            document.getElementById('umkmLainnya').value = '';
+            document.getElementById('bantuanLainnyaWrap').style.maxHeight = '0';
+            document.getElementById('bantuanLainnyaWrap').style.opacity = '0';
+            document.getElementById('bantuanLainnya').value = '';
+            document.getElementById('Bantuan').value = 'Tidak Ada';
+            document.getElementById('sectionBantuan').style.display = 'none';
+            if (pembatikActive) togglePembatikSwitch();
+          }
         })
         .catch(function (err) {
           console.error('Fetch error:', err);
           alert('❌ Gagal mengirim data. Periksa koneksi internet.\n' + err.message);
         })
         .finally(function () {
-          btn.disabled = false;
-          btn.textContent = originalText;
-          btn.classList.remove('opacity-70', 'cursor-not-allowed');
+          btnTambah.disabled = false;
+          btnSelesai.disabled = false;
+          btnTambah.classList.remove('opacity-70', 'cursor-not-allowed');
+          btnSelesai.classList.remove('opacity-70', 'cursor-not-allowed');
         });
-    });
+    }
+
+    // ---- Dual Button Listeners ----
+    document.getElementById('btnSimpanTambah').addEventListener('click', function () { submitForm('partial'); });
+    document.getElementById('btnSimpanSelesai').addEventListener('click', function () { submitForm('full'); });
   </script>
 </body>
 </html>

@@ -393,7 +393,7 @@
 <aside class="sidebar" id="sidebar">
     <!-- Top Logo -->
     <div class="pt-8 pb-6 px-6">
-        <img src="assets/logo-sidemang.png" alt="SI-DEMANG" class="w-20 h-20 mx-auto rounded-full bg-white p-1">
+        <img src="assets/logo-sidemang.png" alt="SI-DEMANG" class="w-20 h-20 mx-auto">
         <h1 class="text-center text-white font-bold text-lg mt-2">SI-DEMANG</h1>
         <p class="text-center text-green-200 text-xs" style="color:rgba(255,255,255,0.6)">Krebet, Pajangan, Bantul</p>
     </div>
@@ -531,7 +531,7 @@ const sidebar         = document.getElementById('sidebar');
 const mobileOverlay   = document.getElementById('mobileOverlay');
 
 // ─── State ───
-let allData = [];
+let allData = []; // This will now hold an array of GROUPS (households)
 let markers = {};
 let activeFilter = 'all';
 let map;
@@ -598,54 +598,132 @@ function getColor(type) {
 }
 
 // ─── Build Popup HTML ───
-function buildPopup(row) {
-    const lat = parseFloat(row.Latitude);
-    const lng = parseFloat(row.Longitude);
+function buildPopup(group) {
+    const primary = group[0]; // Head of Household / Primary Reference
+    const lat = parseFloat(primary.Latitude);
+    const lng = parseFloat(primary.Longitude);
     const routeUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
-    const type = classifyPerson(row);
 
-    const umkmVal = (row.Jenis_UMKM && row.Jenis_UMKM !== '-' && row.Jenis_UMKM.toUpperCase() !== 'TIDAK ADA') ? row.Jenis_UMKM : 'Tidak Ada';
-    const pembatikVal = row.Pembatik || '-';
-    const bantuanVal = (row.Bantuan && row.Bantuan !== '-' && row.Bantuan.toUpperCase() !== 'TIDAK ADA') ? row.Bantuan : 'Tidak Ada';
+    const umkmVal = (primary.Jenis_UMKM && primary.Jenis_UMKM !== '-' && primary.Jenis_UMKM.toUpperCase() !== 'TIDAK ADA') ? primary.Jenis_UMKM : 'Tidak Ada';
+    const pembatikVal = primary.Pembatik || '-';
+    const bantuanVal = (primary.Bantuan && primary.Bantuan !== '-' && primary.Bantuan.toUpperCase() !== 'TIDAK ADA') ? primary.Bantuan : 'Tidak Ada';
 
     const umkmBadgeClass = umkmVal !== 'Tidak Ada' ? 'popup-badge popup-badge-green' : 'popup-badge popup-badge-gray';
     const pembatikBadgeClass = pembatikVal === 'Ya' ? 'popup-badge popup-badge-purple' : 'popup-badge popup-badge-gray';
     const bantuanBadgeClass = bantuanVal !== 'Tidak Ada' ? 'popup-badge popup-badge-blue' : 'popup-badge popup-badge-gray';
 
+    // Family Members Section HTML
+    let membersHtml = '';
+    if (group.length > 1) {
+        const membersList = group.slice(1).map((m, index) => {
+            const usia = m.Usia ? `${m.Usia} thn` : '-';
+            const info = (m.Status_Nikah && m.Status_Nikah !== '-') ? m.Status_Nikah : (m.Pekerjaan || '-');
+            const uid = 'fam-' + index + '-' + Math.floor(Math.random() * 10000);
+            
+            const mUmkmVal = (m.Jenis_UMKM && m.Jenis_UMKM !== '-' && m.Jenis_UMKM.toUpperCase() !== 'TIDAK ADA') ? m.Jenis_UMKM : 'Tidak Ada';
+            const mPembatikVal = m.Pembatik || '-';
+            const mBantuanVal = (m.Bantuan && m.Bantuan !== '-' && m.Bantuan.toUpperCase() !== 'TIDAK ADA') ? m.Bantuan : 'Tidak Ada';
+
+            return `
+                <div style="padding: 6px 0; border-bottom: 1px dashed #e5e7eb; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.backgroundColor='#f3f4f6'" onmouseout="this.style.backgroundColor='transparent'" onclick="var el = document.getElementById('${uid}'); if(el.style.display==='none'){el.style.display='block';}else{el.style.display='none';}">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div style="font-weight:600; font-size:0.8rem; color:#374151;">${m.Nama_Lengkap || '-'}</div>
+                        <div style="font-size:0.75rem; color:#6b7280; text-align:right;">${usia} · ${info} <span style="font-size:0.6rem; color:#069C67; margin-left:4px;">▼</span></div>
+                    </div>
+                    <div id="${uid}" style="display: none; margin-top: 8px; font-size: 0.75rem; color: #4b5563; padding: 6px 8px; border-left: 2px solid #069C67; background: #fff; border-radius: 0 4px 4px 0;">
+                        <div style="margin-bottom:4px; display:flex; align-items:center; gap:6px;"><span>💼</span> <span>${m.Pekerjaan || '-'}</span></div>
+                        <div style="margin-bottom:4px; display:flex; align-items:center; gap:6px;"><span>🎓</span> <span>${m.Pendidikan || '-'}</span></div>
+                        <div style="margin-bottom:4px;">UMKM: <b>${mUmkmVal}</b></div>
+                        <div style="margin-bottom:4px;">Pembatik: <b>${mPembatikVal}</b></div>
+                        <div>Bantuan: <b>${mBantuanVal}</b></div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        membersHtml = `
+            <div style="margin: 12px 0; padding: 10px; background:#f9fafb; border-radius: 8px; border: 1px solid #f3f4f6;">
+                <div style="font-weight:700; font-size:0.8rem; color:#4b5563; margin-bottom: 6px;">Anggota Keluarga Lainnya</div>
+                <div style="max-height: 120px; overflow-y: auto; padding-right: 4px;" class="family-scroll">
+                    ${membersList}
+                </div>
+            </div>
+        `;
+    }
+
     return `
-        <div style="font-family:'Inter',system-ui,sans-serif; padding: 16px; min-width: 240px;">
-            <h3 style="font-weight:700; font-size:1rem; color:#111827; margin:0 0 6px 0;">${row.Nama_Lengkap || '-'}</h3>
-            <p style="font-size:0.85rem; color:#6b7280; margin:0 0 3px;">RT ${row.RT || '-'} · ${row.Usia || '-'} tahun · ${row.Jenis_Kelamin || '-'}</p>
-            <p style="font-size:0.85rem; color:#6b7280; margin:0 0 3px;">💼 ${row.Pekerjaan || '-'}</p>
-            <p style="font-size:0.85rem; color:#6b7280; margin:0 0 8px;">🎓 ${row.Pendidikan || '-'}</p>
-            <p style="font-size:0.85rem; margin:0 0 4px;">🏪 UMKM: <span class="${umkmBadgeClass}">${umkmVal}</span></p>
-            <p style="font-size:0.85rem; margin:0 0 4px;">🎨 Pembatik: <span class="${pembatikBadgeClass}">${pembatikVal}</span></p>
-            <p style="font-size:0.85rem; margin:0 0 12px;">🤝 Bantuan: <span class="${bantuanBadgeClass}">${bantuanVal}</span></p>
+        <div style="font-family:'Inter',system-ui,sans-serif; padding: 16px; min-width: 260px; max-width: 320px;">
+            <h3 style="font-weight:800; font-size:1.1rem; color:#111827; margin:0 0 6px 0;">${primary.Nama_Lengkap || '-'}</h3>
+            <p style="font-size:0.85rem; color:#6b7280; margin:0 0 4px; font-weight:500;">RT ${primary.RT || '-'} · ${primary.Usia || '-'} thn · ${primary.Jenis_Kelamin || '-'}</p>
+
+            <div style="margin-top: 10px; margin-bottom: 12px;">
+                <p style="font-size:0.85rem; color:#4b5563; margin:0 0 5px; display:flex; align-items:center; gap:6px;">
+                    <span>💼</span> <span>${primary.Pekerjaan || '-'}</span>
+                </p>
+                <p style="font-size:0.85rem; color:#4b5563; margin:0 0 8px; display:flex; align-items:center; gap:6px;">
+                    <span>🎓</span> <span>${primary.Pendidikan || '-'}</span>
+                </p>
+                <p style="font-size:0.85rem; margin:0 0 6px;">UMKM: <span class="${umkmBadgeClass}">${umkmVal}</span></p>
+                <p style="font-size:0.85rem; margin:0 0 6px;">Pembatik: <span class="${pembatikBadgeClass}">${pembatikVal}</span></p>
+                <p style="font-size:0.85rem; margin:0 0 0;">Bantuan: <span class="${bantuanBadgeClass}">${bantuanVal}</span></p>
+            </div>
+
+            ${membersHtml}
+
             <a href="${routeUrl}" target="_blank" rel="noopener noreferrer" style="
-                display:block; width:100%; text-align:center;
+                display:flex; justify-content:center; align-items:center; gap:6px;
+                width:100%; margin-top:14px;
                 background:#069C67; color:#fff;
-                border-radius:0.5rem; padding:0.625rem;
+                border-radius:0.5rem; padding:0.65rem;
                 font-size:0.85rem; font-weight:700;
                 text-decoration:none;
                 transition: background 0.2s;
-            " onmouseover="this.style.background='#057a52'" onmouseout="this.style.background='#069C67'">📍 Buka Rute di Gmaps</a>
+            " onmouseover="this.style.background='#057a52'" onmouseout="this.style.background='#069C67'">
+                📍 Buka Rute di Gmaps
+            </a>
         </div>
     `;
 }
 
-// ─── Load Data ───
+// ─── Load Data & Grouping Logic ───
 async function loadData() {
     try {
         const res = await fetch(GAS_URL);
         const json = await res.json();
-        allData = (json.data || json).filter(r => {
+        const rawData = (json.data || json).filter(r => {
             const lat = parseFloat(r.Latitude);
             const lng = parseFloat(r.Longitude);
             return !isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0;
         });
+
+        // Grouping Logic
+        const groupMap = new Map();
+
+        rawData.forEach(row => {
+            const kk = String(row.No_KK || '').trim();
+            const lat = parseFloat(row.Latitude);
+            const lng = parseFloat(row.Longitude);
+
+            let groupKey;
+            if (kk && kk !== '-' && kk.toLowerCase() !== 'tanpa kk') {
+                groupKey = 'kk_' + kk;
+            } else {
+                // Fallback grouping for missing KK but same exact GPS
+                groupKey = 'loc_' + lat + '_' + lng;
+            }
+
+            if (!groupMap.has(groupKey)) {
+                groupMap.set(groupKey, []);
+            }
+            groupMap.get(groupKey).push(row);
+        });
+
+        // Store grouped data (Array of Arrays)
+        allData = Array.from(groupMap.values());
+
         renderMarkers(allData);
         renderLocationList(allData);
-        markerCountText.textContent = `${allData.length} Titik`;
+        markerCountText.textContent = `${allData.length} Titik (KK)`;
     } catch (err) {
         console.error('Gagal memuat data:', err);
         locationList.innerHTML = '<p class="text-center text-sm text-red-500 p-6">Gagal memuat data.</p>';
@@ -655,44 +733,47 @@ async function loadData() {
 }
 
 // ─── Render Markers ───
-function renderMarkers(data) {
+function renderMarkers(groupedData) {
     // Clear existing
     Object.values(markers).forEach(m => map.removeLayer(m));
     markers = {};
 
-    data.forEach((row, i) => {
-        const lat = parseFloat(row.Latitude);
-        const lng = parseFloat(row.Longitude);
-        const type = classifyPerson(row);
+    groupedData.forEach((group, i) => {
+        const primary = group[0];
+        const lat = parseFloat(primary.Latitude);
+        const lng = parseFloat(primary.Longitude);
+        const type = classifyPerson(primary);
         const icon = createMarkerIcon(getColor(type));
 
         const marker = L.marker([lat, lng], { icon })
-            .bindPopup(buildPopup(row), { maxWidth: 320 })
+            .bindPopup(buildPopup(group), { maxWidth: 320 })
             .addTo(map);
 
         markers[i] = marker;
-        row._index = i;
-        row._type = type;
+        group._index = i;
+        primary._type = type;
     });
 }
 
 // ─── Render Location List ───
-function renderLocationList(data) {
-    if (data.length === 0) {
+function renderLocationList(groupedData) {
+    if (groupedData.length === 0) {
         locationList.innerHTML = '<p class="text-center text-sm text-gray-400 p-8">Tidak ada data ditemukan.</p>';
         return;
     }
 
-    locationList.innerHTML = data.map((row, idx) => {
-        const type = row._type || classifyPerson(row);
+    locationList.innerHTML = groupedData.map((group, idx) => {
+        const primary = group[0];
+        const type = primary._type || classifyPerson(primary);
         const color = getColor(type);
         const label = type === 'umkm' ? 'UMKM' : type === 'pembatik' ? 'Pembatik' : 'Warga';
+        
         return `
-            <div class="location-item" data-idx="${row._index}">
+            <div class="location-item" data-idx="${group._index}">
                 <span class="location-dot" style="background:${color};"></span>
                 <div style="min-width:0; flex:1;">
-                    <div class="location-item-name">${row.Nama_Lengkap || '-'}</div>
-                    <div class="location-item-detail">RT ${row.RT || '-'} · ${label}</div>
+                    <div class="location-item-name">${primary.Nama_Lengkap || '-'}</div>
+                    <div class="location-item-detail">RT ${primary.RT || '-'} · ${label} ${group.length > 1 ? `· (${group.length} Orang)` : ''}</div>
                 </div>
             </div>
         `;
@@ -720,17 +801,23 @@ function renderLocationList(data) {
 function applyFilterAndSearch() {
     const query = searchInput.value.toLowerCase().trim();
 
-    let filtered = allData.filter(row => {
-        // Filter
-        if (activeFilter === 'umkm' && row._type !== 'umkm') return false;
-        if (activeFilter === 'pembatik' && row._type !== 'pembatik') return false;
-        if (activeFilter === 'warga' && row._type !== 'regular') return false;
+    let filtered = allData.filter(group => {
+        const primary = group[0];
+        const type = primary._type || classifyPerson(primary);
 
-        // Search
+        // Filter based on the Primary Reference (Household Head)
+        if (activeFilter === 'umkm' && type !== 'umkm') return false;
+        if (activeFilter === 'pembatik' && type !== 'pembatik') return false;
+        if (activeFilter === 'warga' && type !== 'regular') return false;
+
+        // Search across all members in the household
         if (query) {
-            const name = (row.Nama_Lengkap || '').toLowerCase();
-            const rt = ('rt ' + (row.RT || '')).toLowerCase();
-            if (!name.includes(query) && !rt.includes(query)) return false;
+            const matches = group.some(m => {
+                const name = (m.Nama_Lengkap || '').toLowerCase();
+                const rt = ('rt ' + (m.RT || '')).toLowerCase();
+                return name.includes(query) || rt.includes(query);
+            });
+            if (!matches) return false;
         }
 
         return true;
@@ -738,7 +825,7 @@ function applyFilterAndSearch() {
 
     renderMarkers(filtered);
     renderLocationList(filtered);
-    markerCountText.textContent = `${filtered.length} Titik`;
+    markerCountText.textContent = `${filtered.length} Titik (KK)`;
 }
 
 // Filter tab clicks
