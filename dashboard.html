@@ -297,6 +297,68 @@
             </div>
           </div>
 
+          <!-- Pelajar / Mahasiswa -->
+          <div class="bg-white rounded-2xl shadow-md p-5 border border-gray-100 fade-in-up">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-xl bg-cyan-100 flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-cyan-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z" /></svg>
+              </div>
+              <div class="min-w-0">
+                <p class="text-xs text-gray-500 truncate">Pelajar & Mahasiswa (6-24 thn)</p>
+                <p id="statPelajar" class="text-xl font-extrabold text-gray-900 mt-0.5">0</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Masih Hidup -->
+          <div class="bg-white rounded-2xl shadow-md p-5 border border-gray-100 fade-in-up">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-xl bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" /></svg>
+              </div>
+              <div class="min-w-0">
+                <p class="text-xs text-gray-500 truncate">Masih Hidup</p>
+                <p id="statHidup" class="text-xl font-extrabold text-gray-900 mt-0.5">0</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sudah Menikah -->
+          <div class="bg-white rounded-2xl shadow-md p-5 border border-gray-100 fade-in-up">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-xl bg-pink-100 flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-pink-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" /></svg>
+              </div>
+              <div class="min-w-0">
+                <p class="text-xs text-gray-500 truncate">Sudah Menikah</p>
+                <p id="statMenikah" class="text-xl font-extrabold text-gray-900 mt-0.5">0</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Belum Menikah -->
+          <div class="bg-white rounded-2xl shadow-md p-5 border border-gray-100 fade-in-up">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" /></svg>
+              </div>
+              <div class="min-w-0">
+                <p class="text-xs text-gray-500 truncate">Belum Menikah</p>
+                <p id="statBelumMenikah" class="text-xl font-extrabold text-gray-900 mt-0.5">0</p>
+              </div>
+            </div>
+          </div>
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-xl bg-orange-100 flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+              </div>
+              <div class="min-w-0">
+                <p class="text-xs text-gray-500 truncate">Rata-rata Usia</p>
+                <p id="statAvgAge" class="text-xl font-extrabold text-gray-900 mt-0.5">0</p>
+              </div>
+            </div>
+          </div>
+
 
         </div>
 
@@ -663,14 +725,16 @@
     }
 
     // ============ LOAD DATA ============
-    async function loadData() {
+    async function loadData(silent = false) {
       var loadingEl = document.getElementById('loadingState');
       var errorEl = document.getElementById('errorState');
       var dashboardEl = document.getElementById('dashboardContent');
 
-      loadingEl.classList.remove('hidden');
-      errorEl.classList.add('hidden');
-      dashboardEl.classList.add('hidden');
+      if (!silent) {
+        loadingEl.classList.remove('hidden');
+        errorEl.classList.add('hidden');
+        dashboardEl.classList.add('hidden');
+      }
 
       try {
         var res = await fetch(GAS_URL);
@@ -678,15 +742,31 @@
         var json = await res.json();
         var data = json.data || json;
         allData = Array.isArray(data) ? data : [];
-        loadingEl.classList.add('hidden');
-        dashboardEl.classList.remove('hidden');
+        if (!silent) {
+          loadingEl.classList.add('hidden');
+          dashboardEl.classList.remove('hidden');
+        }
+        
+        // Preserve current filter values
+        var curPekerjaan = document.getElementById('filterPekerjaan').value;
+        var curBantuan = document.getElementById('filterBantuan').value;
+        var curUMKM = document.getElementById('filterUMKM').value;
+        
         populateFilterDropdowns(allData);
+        
+        // Restore filter values
+        if (curPekerjaan) document.getElementById('filterPekerjaan').value = curPekerjaan;
+        if (curBantuan) document.getElementById('filterBantuan').value = curBantuan;
+        if (curUMKM) document.getElementById('filterUMKM').value = curUMKM;
+        
         renderDashboard(allData);
         applyFilters();
       } catch (err) {
         console.error('Fetch error:', err);
-        loadingEl.classList.add('hidden');
-        errorEl.classList.remove('hidden');
+        if (!silent) {
+          loadingEl.classList.add('hidden');
+          errorEl.classList.remove('hidden');
+        }
       }
     }
 
@@ -794,6 +874,12 @@
 
     // ============ RENDER KK TABLE ============
     function renderKKTable(data) {
+      // Preserve hidden groups before overwriting
+      var hiddenGroups = new Set();
+      document.querySelectorAll('.kk-chevron.collapsed').forEach(function(el) {
+        hiddenGroups.add(el.id.replace('chevron-', ''));
+      });
+
       editableData = data;
       var tbody = document.getElementById('tableBody');
       var groups = groupByKK(data);
@@ -801,11 +887,13 @@
 
       groups.forEach(function(members, kkNumber) {
         var groupId = 'kk-' + kkNumber.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '');
+        var displayStyle = hiddenGroups.has(groupId) ? 'style="display: none;"' : '';
+        var chevronClass = hiddenGroups.has(groupId) ? 'kk-chevron collapsed' : 'kk-chevron';
 
         html += '<tr class="kk-header-toggle bg-green-50" onclick="toggleKKGroup(\'' + groupId + '\')">' +
           '<td colspan="10" class="px-4 py-3">' +
             '<div class="flex items-center gap-2">' +
-              '<span class="kk-chevron" id="chevron-' + groupId + '">▼</span>' +
+              '<span class="' + chevronClass + '" id="chevron-' + groupId + '">▼</span>' +
               '<span class="font-bold text-gray-800 text-sm">KK: ' + kkNumber + ' — <span class="font-semibold text-gray-600">' + members.length + ' anggota</span></span>' +
             '</div>' +
           '</td>' +
@@ -832,7 +920,7 @@
             nameHtml += ' <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[0.65rem] font-bold bg-red-100 text-red-700 ml-1">Meninggal</span>';
           }
 
-          html += '<tr class="hover:bg-gray-50 transition-colors kk-member-' + groupId + '">' +
+          html += '<tr class="hover:bg-gray-50 transition-colors kk-member-' + groupId + '" ' + displayStyle + '>' +
             '<td class="px-4 py-3 text-xs text-gray-400 font-medium">' + (i + 1) + '</td>' +
             '<td class="px-4 py-3 text-sm font-medium text-gray-900 whitespace-nowrap">' + nameHtml + '</td>' +
             '<td class="px-4 py-3 text-sm text-gray-600">' + (d.Jenis_Kelamin || '-') + '</td>' +
@@ -843,10 +931,14 @@
             '<td class="px-4 py-3">' + pembatikBadge + '</td>' +
             '<td class="px-4 py-3">' + bantuanBadge + '</td>' +
             '<td class="px-4 py-3">' +
-              '<button onclick="openEditModal(' + dataIdx + ')" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-all inline-flex items-center gap-1">' +
-                '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"/></svg>' +
-                ' Edit' +
-              '</button>' +
+              '<div class="flex gap-1">' +
+                '<button onclick="openEditModal(' + dataIdx + ')" class="px-2.5 py-1.5 text-[0.7rem] font-semibold rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-all inline-flex items-center gap-1" title="Edit">' +
+                  '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"/></svg>' +
+                '</button>' +
+                '<button onclick="deleteData(\'' + d.Timestamp + '\')" class="px-2.5 py-1.5 text-[0.7rem] font-semibold rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition-all inline-flex items-center gap-1" title="Hapus">' +
+                  '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>' +
+                '</button>' +
+              '</div>' +
             '</td>' +
           '</tr>';
         });
@@ -1127,6 +1219,27 @@
         });
     }
 
+    function deleteData(timestamp) {
+      if (!confirm('Apakah Anda yakin ingin menghapus data ini? Data yang sudah dihapus tidak dapat dikembalikan.')) return;
+
+      var payload = { action: 'delete', Timestamp: timestamp };
+
+      fetch(GAS_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      })
+      .then(function() {
+        alert('✅ Data berhasil dihapus!');
+        loadData();
+      })
+      .catch(function(err) {
+        console.error('Delete error:', err);
+        alert('❌ Gagal menghapus data.\n' + err.message);
+      });
+    }
+
     // ---- Edit modal event listeners ----
     document.getElementById('edit_Tanggal_Lahir').addEventListener('change', function() {
       if (this.value) {
@@ -1181,6 +1294,20 @@
       var bantuanCount = data.filter(function(d) { return hasBantuan(d); }).length;
       var ages = data.map(function(d) { return parseInt(d.Usia); }).filter(function(a) { return !isNaN(a); });
       var avgAge = ages.length ? (ages.reduce(function(a, b) { return a + b; }, 0) / ages.length).toFixed(1) : 0;
+      
+      var pelajarCount = data.filter(function(d) {
+        var u = parseInt(d.Usia);
+        return (!isNaN(u) && u >= 6 && u <= 24);
+      }).length;
+      var hidupCount = data.filter(function(d) {
+        return String(d.Status_Kematian || '').trim().toUpperCase() !== 'MENINGGAL';
+      }).length;
+      var menikahCount = data.filter(function(d) {
+        return String(d.Status_Nikah || '').trim().toUpperCase() === 'MENIKAH';
+      }).length;
+      var belumMenikahCount = data.filter(function(d) {
+        return String(d.Status_Nikah || '').trim().toUpperCase() === 'BELUM MENIKAH';
+      }).length;
 
       document.getElementById('statTotal').textContent = total.toLocaleString('id-ID');
       document.getElementById('statKK').textContent = kkCount.toLocaleString('id-ID');
@@ -1188,6 +1315,10 @@
       document.getElementById('statPembatik').textContent = pembatikCount.toLocaleString('id-ID');
       document.getElementById('statBantuan').textContent = bantuanCount.toLocaleString('id-ID');
       document.getElementById('statAvgAge').textContent = avgAge + ' th';
+      document.getElementById('statPelajar').textContent = pelajarCount.toLocaleString('id-ID');
+      document.getElementById('statHidup').textContent = hidupCount.toLocaleString('id-ID');
+      document.getElementById('statMenikah').textContent = menikahCount.toLocaleString('id-ID');
+      document.getElementById('statBelumMenikah').textContent = belumMenikahCount.toLocaleString('id-ID');
 
       Object.values(charts).forEach(function(c) { c.destroy(); });
       charts = {};
@@ -1364,6 +1495,16 @@
 
     // ============ INIT ============
     loadData();
+
+    // ============ AUTO REFRESH ============
+    setInterval(function() {
+      // Hanya auto-refresh jika modal edit sedang tidak dibuka
+      var editModal = document.getElementById('editModal');
+      if (editModal && !editModal.classList.contains('hidden')) {
+        return;
+      }
+      loadData(true); // silent refresh
+    }, 15000); // 15 seconds
   </script>
 </body>
 </html>

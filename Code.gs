@@ -103,8 +103,8 @@ function doPost(e) {
     // Accept flexible field names
     const namaLengkap = body.Nama_Lengkap || body.Nama || '-';
 
-    // Soft validation — only Nama_Lengkap is truly required
-    if (!namaLengkap || namaLengkap === '-') {
+    // Soft validation — only Nama_Lengkap is truly required (except for delete)
+    if (action !== 'delete' && (!namaLengkap || namaLengkap === '-')) {
       return buildJsonResponse({ success: false, error: 'Field "Nama_Lengkap" wajib diisi.' });
     }
 
@@ -221,6 +221,38 @@ function doPost(e) {
       sheet.getRange(targetRow, 1, 1, COLUMNS.length).setValues([updatedRow]);
 
       return buildJsonResponse({ success: true, message: 'Data berhasil diperbarui!' });
+    }
+
+    // ============ DELETE ============
+    if (action === 'delete') {
+      const targetTimestamp = body.Timestamp;
+      if (!targetTimestamp) {
+        return buildJsonResponse({ success: false, error: 'Timestamp diperlukan untuk delete.' });
+      }
+
+      const lastRow = sheet.getLastRow();
+      if (lastRow < 2) {
+        return buildJsonResponse({ success: false, error: 'Tidak ada data untuk dihapus.' });
+      }
+
+      const timestamps = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+      let targetRow = -1;
+
+      for (let i = 0; i < timestamps.length; i++) {
+        const cellVal = timestamps[i][0];
+        const cellStr = (cellVal instanceof Date) ? cellVal.toISOString() : String(cellVal);
+        if (cellStr === targetTimestamp) {
+          targetRow = i + 2;
+          break;
+        }
+      }
+
+      if (targetRow === -1) {
+        return buildJsonResponse({ success: false, error: 'Data tidak ditemukan untuk dihapus.' });
+      }
+
+      sheet.deleteRow(targetRow);
+      return buildJsonResponse({ success: true, message: 'Data berhasil dihapus!' });
     }
 
     return buildJsonResponse({ success: false, error: 'Action tidak dikenal: ' + action });
