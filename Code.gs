@@ -23,7 +23,8 @@ const COLUMNS = [
   'Jumlah_Pembatik',
   'Bantuan',
   'Latitude',
-  'Longitude'
+  'Longitude',
+  'Status_Kependudukan'
 ];
 
 // ============================================================
@@ -133,6 +134,8 @@ function doPost(e) {
     const latitude = isNaN(lat) ? 0 : lat;
     const longitude = isNaN(lng) ? 0 : lng;
 
+    const statusKependudukan = body.Status_Kependudukan || 'Warga Asli (KTP/KK Krebet)';
+
     // ============ CREATE ============
     if (action === 'create') {
       const rowData = [
@@ -153,7 +156,8 @@ function doPost(e) {
         jumlahPembatik,    // Jumlah_Pembatik
         bantuan,           // Bantuan
         latitude,          // Latitude
-        longitude          // Longitude
+        longitude,         // Longitude
+        statusKependudukan // Status_Kependudukan
       ];
 
       sheet.appendRow(rowData);
@@ -215,7 +219,8 @@ function doPost(e) {
         jumlahPembatik,
         bantuan,
         latitude,
-        longitude
+        longitude,
+        statusKependudukan
       ];
 
       sheet.getRange(targetRow, 1, 1, COLUMNS.length).setValues([updatedRow]);
