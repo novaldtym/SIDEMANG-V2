@@ -448,9 +448,14 @@
 
 <!-- ═══════════════ MAIN MAP AREA ═══════════════ -->
 <div class="map-wrapper" id="mapWrapper">
-
-    <!-- Map -->
+    <!-- Map Container -->
     <div id="map"></div>
+
+    <!-- Big Floating Live Location Button -->
+    <button type="button" id="btnLiveLocation" class="absolute top-4 left-1/2 -translate-x-1/2 z-[800] bg-white text-primary border border-gray-200 shadow-lg px-5 py-3 rounded-full font-bold text-sm flex items-center gap-2 hover:bg-green-50 transition-all active:scale-95">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/></svg>
+        Lokasi Saya
+    </button>
 
     <!-- Marker Count Badge -->
     <div class="marker-count-badge" id="markerCountBadge">
@@ -570,19 +575,25 @@ function initMap() {
 
     L.control.zoom({ position: 'topright' }).addTo(map);
 
-    // ─── Live Location Control ───
-    L.control.locate({
+    // ─── Custom Live Location Button Logic ───
+    const lc = L.control.locate({
         position: 'topleft',
-        strings: {
-            title: "Tampilkan Lokasi Saya"
-        },
+        drawCircle: true,
         flyTo: true,
         showCompass: true,
-        drawCircle: true,
+        keepCurrentZoomLevel: false,
         locateOptions: {
             enableHighAccuracy: true
         }
     }).addTo(map);
+
+    // Sembunyikan tombol default bawaan plugin agar tidak dobel
+    document.querySelector('.leaflet-control-locate').style.display = 'none';
+
+    // Sambungkan tombol kustom ke plugin
+    document.getElementById('btnLiveLocation').addEventListener('click', function() {
+        lc.start();
+    });
 
     loadData();
 }

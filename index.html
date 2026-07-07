@@ -448,6 +448,7 @@
 
     // ---- Fetch Existing KKs for Smart Continuation ----
     const existingKKs = {};
+    const existingNIKs = new Set();
     let dataLoaded = false;
 
     async function loadExistingData() {
@@ -466,6 +467,9 @@
                   Longitude: d.Longitude
                 };
               }
+            }
+            if (d.NIK && String(d.NIK).trim() !== '-' && String(d.NIK).trim().length > 5) {
+              existingNIKs.add(String(d.NIK).trim());
             }
           });
         }
@@ -738,17 +742,33 @@
       }
     });
 
-    // ---- NIK Validation (digits only, warning only) ----
+    // ---- NIK Validation ----
     const nikInput = document.getElementById('NIK');
     const nikError = document.getElementById('nikError');
 
-    nikInput.addEventListener('input', function () {
-      this.value = this.value.replace(/\D/g, '').slice(0, 16);
-      if (this.value.length > 0 && this.value.length < 16) {
+    function validateNIK() {
+      const nik = nikInput.value.trim();
+      if (nik.length > 5 && existingNIKs.has(nik)) {
         nikError.classList.remove('hidden');
+        nikError.textContent = '❌ NIK ini sudah terdaftar di database. Silakan periksa kembali.';
+        nikError.classList.remove('text-blue-600', 'text-yellow-600');
+        nikError.classList.add('text-red-500');
+        return false;
+      } else if (nik.length > 0 && nik.length < 16) {
+        nikError.classList.remove('hidden');
+        nikError.textContent = 'NIK biasanya terdiri dari 16 digit angka.';
+        nikError.classList.remove('text-blue-600', 'text-red-500');
+        nikError.classList.add('text-yellow-600');
+        return true;
       } else {
         nikError.classList.add('hidden');
+        return true;
       }
+    }
+
+    nikInput.addEventListener('input', function () {
+      this.value = this.value.replace(/\D/g, '').slice(0, 16);
+      validateNIK();
     });
 
     // ---- Auto Uppercase Text Inputs ----
@@ -763,6 +783,13 @@
 
     // ---- Shared Submit Function ----
     function submitForm(resetMode) {
+      // Validate NIK duplication first
+      if (!validateNIK()) {
+        alert('Data gagal disimpan: NIK sudah terdaftar. Harap periksa kembali isian Anda.');
+        nikInput.focus();
+        return;
+      }
+
       // Validate only Nama Lengkap
       const namaInput = document.getElementById('Nama');
       if (!namaInput.value.trim()) {

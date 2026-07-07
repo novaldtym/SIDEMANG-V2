@@ -138,6 +138,19 @@ function doPost(e) {
 
     // ============ CREATE ============
     if (action === 'create') {
+      // Validasi NIK tidak boleh sama
+      if (nik && nik !== '-' && nik.length > 5) {
+        const lastRow = sheet.getLastRow();
+        if (lastRow > 1) {
+          const niks = sheet.getRange(2, 3, lastRow - 1, 1).getValues(); // Column C (NIK)
+          for (let i = 0; i < niks.length; i++) {
+            if (String(niks[i][0]).trim() === nik) {
+              return buildJsonResponse({ success: false, error: 'Data gagal disimpan: NIK ini sudah terdaftar di database.' });
+            }
+          }
+        }
+      }
+
       const rowData = [
         new Date(),        // Timestamp
         noKK,              // No_KK

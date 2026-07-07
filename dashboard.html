@@ -8,6 +8,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script>
@@ -651,16 +653,21 @@
               <input type="text" id="edit_BantuanLainnya" placeholder="Tuliskan bantuan lainnya..." class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm">
             </div>
           </div>
-          <!-- Coordinates -->
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-1.5">Latitude</label>
-              <input type="text" id="edit_Latitude" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-gray-50 text-sm text-gray-600" readonly>
+          <!-- Coordinates & Map -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Lokasi Koordinat GPS</label>
+            <div id="editMapContainer" class="w-full h-[200px] bg-gray-200 rounded-xl mb-3 shadow-inner z-10 relative"></div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-gray-500 mb-1">Latitude</label>
+                <input type="text" id="edit_Latitude" class="w-full px-3 py-2 rounded-lg border border-gray-300 bg-gray-50 text-sm text-gray-600" readonly>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-500 mb-1">Longitude</label>
+                <input type="text" id="edit_Longitude" class="w-full px-3 py-2 rounded-lg border border-gray-300 bg-gray-50 text-sm text-gray-600" readonly>
+              </div>
             </div>
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-1.5">Longitude</label>
-              <input type="text" id="edit_Longitude" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-gray-50 text-sm text-gray-600" readonly>
-            </div>
+            <p class="text-[0.65rem] text-gray-400 mt-1.5 text-center">Geser marker merah pada peta di atas untuk mengoreksi letak rumah warga.</p>
           </div>
         </div>
         <!-- Modal Footer -->
@@ -684,6 +691,8 @@
     let filteredData = [];
     let editableData = [];
     let editPembatikActive = false;
+    let editMap = null;
+    let editMarker = null;
 
     // ============ MOBILE SIDEBAR ============
     const btnHamburger = document.getElementById('btnHamburger');
@@ -1108,6 +1117,38 @@
 
       document.getElementById('editModal').classList.remove('hidden');
       document.body.style.overflow = 'hidden';
+
+      // Map Initialization
+      var latVal = parseFloat(d.Latitude);
+      var lngVal = parseFloat(d.Longitude);
+      
+      // Fallback ke tengah Krebet jika invalid
+      if (isNaN(latVal) || isNaN(lngVal) || latVal === 0 || lngVal === 0) {
+        latVal = -7.864690;
+        lngVal = 110.313460;
+      }
+      
+      if (!editMap) {
+        editMap = L.map('editMapContainer').setView([latVal, lngVal], 18);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '© OpenStreetMap'
+        }).addTo(editMap);
+
+        editMarker = L.marker([latVal, lngVal], { draggable: true }).addTo(editMap);
+
+        editMarker.on('dragend', function (e) {
+          const pos = editMarker.getLatLng();
+          document.getElementById('edit_Latitude').value = pos.lat.toFixed(7);
+          document.getElementById('edit_Longitude').value = pos.lng.toFixed(7);
+        });
+      } else {
+        editMap.setView([latVal, lngVal], 18);
+        editMarker.setLatLng([latVal, lngVal]);
+      }
+      
+      // Fix rendering issues for hidden maps
+      setTimeout(function() { editMap.invalidateSize(); }, 100);
     }
 
     function closeEditModal() {
