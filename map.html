@@ -467,6 +467,10 @@
     <div class="map-legend">
         <div class="font-semibold text-xs text-gray-700 mb-2">Legenda</div>
         <div class="legend-item">
+            <span class="legend-dot" style="background:#3b82f6;"></span>
+            <span class="text-gray-700">Homestay</span>
+        </div>
+        <div class="legend-item">
             <span class="legend-dot" style="background:#069C67;"></span>
             <span class="text-gray-700">UMKM</span>
         </div>
@@ -497,6 +501,7 @@
         </div>
         <div class="filter-tabs" id="filterTabs">
             <button class="filter-tab active" data-filter="all">Semua</button>
+            <button class="filter-tab" data-filter="homestay">🏠 Homestay</button>
             <button class="filter-tab" data-filter="umkm">🏪 UMKM</button>
             <button class="filter-tab" data-filter="pembatik">🎨 Pembatik</button>
             <button class="filter-tab" data-filter="warga">👤 Warga</button>
@@ -522,6 +527,7 @@ const ZOOM_DEFAULT = 15;
 
 // ─── Marker Colors ───
 const COLORS = {
+    homestay: '#3b82f6',
     umkm:     '#069C67',
     pembatik: '#8b5cf6',
     regular:  '#6b7280'
@@ -617,6 +623,7 @@ function createMarkerIcon(color) {
 
 // ─── Classify Person ───
 function classifyPerson(row) {
+    if (row.Jenis_UMKM && row.Jenis_UMKM.toLowerCase().includes('homestay')) return 'homestay';
     if (row.Pembatik === 'Ya') return 'pembatik';
     if (row.Jenis_UMKM && row.Jenis_UMKM !== '-' && row.Jenis_UMKM.toUpperCase() !== 'TIDAK ADA') return 'umkm';
     return 'regular';
