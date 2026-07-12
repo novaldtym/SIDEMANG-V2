@@ -849,6 +849,7 @@ function applyFilterAndSearch() {
         const type = primary._type || classifyPerson(primary);
 
         // Filter based on the Primary Reference (Household Head)
+        if (activeFilter === 'homestay' && type !== 'homestay') return false;
         if (activeFilter === 'umkm' && type !== 'umkm') return false;
         if (activeFilter === 'pembatik' && type !== 'pembatik') return false;
         if (activeFilter === 'warga' && type !== 'regular') return false;
