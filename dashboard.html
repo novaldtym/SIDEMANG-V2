@@ -379,7 +379,7 @@
             <div class="relative" style="height: 280px;"><canvas id="chartPekerjaan"></canvas></div>
           </div>
           <div class="bg-white rounded-2xl shadow-md p-5 border border-gray-100">
-            <h3 class="text-sm font-semibold text-gray-800 mb-4">Jumlah Warga per RT</h3>
+            <h3 class="text-sm font-semibold text-gray-800 mb-4">Jumlah Warga & KK per RT</h3>
             <div class="relative" style="height: 280px;"><canvas id="chartRT"></canvas></div>
           </div>
           <div class="bg-white rounded-2xl shadow-md p-5 border border-gray-100">
@@ -528,7 +528,7 @@
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-1.5">Pendidikan</label>
             <select id="edit_Pendidikan" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm bg-white">
-              <option value="">Pilih</option><option value="Tidak Sekolah">Tidak Sekolah</option><option value="SD">SD</option><option value="SMP">SMP</option><option value="SMA/SMK">SMA/SMK</option><option value="D1-D3">D1-D3</option><option value="S1">S1</option><option value="S2">S2</option><option value="S3">S3</option>
+              <option value="">Pilih</option><option value="Tidak/Belum Sekolah">Tidak/Belum Sekolah</option><option value="Tidak Tamat SD / Sederajat">Tidak Tamat SD / Sederajat</option><option value="Tamat SD / Sederajat">Tamat SD / Sederajat</option><option value="SMP">SMP</option><option value="SMA/SMK">SMA/SMK</option><option value="D1-D3">D1-D3</option><option value="S1">S1</option><option value="S2">S2</option><option value="S3">S3</option>
             </select>
           </div>
           <!-- Pekerjaan -->
@@ -1432,14 +1432,41 @@
         options: { ...chartDefaults, indexAxis: 'y', plugins: { ...chartDefaults.plugins, legend: { display: false } }, scales: { x: { beginAtZero: true, ticks: { font: { family: 'Inter', size: 11 }, stepSize: 1 }, grid: { color: '#f1f5f9' } }, y: { ticks: { font: { family: 'Inter', size: 11 } }, grid: { display: false } } } }
       });
 
-      // --- 4) Jumlah Warga per RT ---
-      var rtMap = {};
-      data.forEach(function(d) { var v = d.RT; if (v) rtMap[v] = (rtMap[v] || 0) + 1; });
-      var rtSorted = Object.entries(rtMap).sort(function(a, b) { var na = parseInt(a[0]), nb = parseInt(b[0]); return (isNaN(na) ? 999 : na) - (isNaN(nb) ? 999 : nb); });
+      // --- 4) Jumlah Warga & KK per RT ---
+      var rtMapWarga = {};
+      var rtKKSet = {};
+      
+      data.forEach(function(d) { 
+        var rt = d.RT; 
+        if (rt) {
+          rtMapWarga[rt] = (rtMapWarga[rt] || 0) + 1; 
+          var kk = String(d.No_KK || '').trim();
+          if (kk && kk !== '-' && kk.toLowerCase() !== 'tanpa kk') {
+            if (!rtKKSet[rt]) rtKKSet[rt] = new Set();
+            rtKKSet[rt].add(kk);
+          }
+        }
+      });
+      
+      var rtSorted = Object.keys(rtMapWarga).sort(function(a, b) { var na = parseInt(a), nb = parseInt(b); return (isNaN(na) ? 999 : na) - (isNaN(nb) ? 999 : nb); });
+      
       charts.rt = new Chart(document.getElementById('chartRT'), {
         type: 'bar',
-        data: { labels: rtSorted.map(function(e) { return 'RT ' + e[0]; }), datasets: [{ label: 'Warga', data: rtSorted.map(function(e) { return e[1]; }), backgroundColor: '#8b5cf6', borderRadius: 6, barThickness: 32 }] },
-        options: { ...chartDefaults, plugins: { ...chartDefaults.plugins, legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { font: { family: 'Inter', size: 11 }, stepSize: 1 }, grid: { color: '#f1f5f9' } }, x: { ticks: { font: { family: 'Inter', size: 11 } }, grid: { display: false } } } }
+        data: { 
+          labels: rtSorted.map(function(rt) { return 'RT ' + rt; }), 
+          datasets: [
+            { label: 'Warga', data: rtSorted.map(function(rt) { return rtMapWarga[rt]; }), backgroundColor: '#8b5cf6', borderRadius: 4, barThickness: 16 },
+            { label: 'KK', data: rtSorted.map(function(rt) { return rtKKSet[rt] ? rtKKSet[rt].size : 0; }), backgroundColor: '#f59e0b', borderRadius: 4, barThickness: 16 }
+          ] 
+        },
+        options: { 
+          ...chartDefaults, 
+          plugins: { ...chartDefaults.plugins, legend: { display: true, position: 'top' } }, 
+          scales: { 
+            y: { beginAtZero: true, ticks: { font: { family: 'Inter', size: 11 }, stepSize: 1 }, grid: { color: '#f1f5f9' } }, 
+            x: { ticks: { font: { family: 'Inter', size: 11 } }, grid: { display: false } } 
+          } 
+        }
       });
 
       // --- 5) Jenis Kelamin ---
